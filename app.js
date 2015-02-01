@@ -46426,6 +46426,8 @@ var ArticleEditorView = React.createClass({displayName: "ArticleEditorView",
             ref: "briefImage", 
             tag: "briefImage", 
             type: "file"}, 
+            React.createElement("p", null, "Cover Image"), 
+            React.createElement("p", null, '（推荐尺寸：640*250 Pixels）'), 
             React.createElement("img", {src: briefImage ? briefImage.url() : null})
           )
         )
@@ -47151,6 +47153,7 @@ var StreetImageEditorView = React.createClass({displayName: "StreetImageEditorVi
             tag: "coverImage", 
             type: "file"}, 
             React.createElement("p", null, "Cover Image"), 
+            React.createElement("p", null, '（推荐尺寸：800*1200 Pixels）'), 
             React.createElement("img", {src: coverImage ? coverImage.url() : null})
           ), 
           this.state.streetDetailImages.map(function(streetDetailImage) {
@@ -47166,6 +47169,7 @@ var StreetImageEditorView = React.createClass({displayName: "StreetImageEditorVi
                     "Remove Image"
                   )
                 ), 
+                React.createElement("p", null, '（推荐尺寸：800*1200 Pixels）'), 
                 React.createElement("img", {src: image ? image.url() : null})
               )
             );
