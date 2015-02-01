@@ -28,9 +28,10 @@ var StreetImageListView = React.createClass({
     };
   },
 
-  updateStreetImages: function() {
+  updateStreetImages: function(nextSession) {
+    var session = nextSession || this.props.session;
     var query = new Parse.Query(StreetImage);
-    query.equalTo('belongTo', this.props.session);
+    query.equalTo('belongTo', session);
     query.find().then(function(streetImages) {
       this.setState({streetImages: streetImages});
     }.bind(this));
@@ -40,8 +41,8 @@ var StreetImageListView = React.createClass({
     this.updateStreetImages();
   },
 
-  componentWillUpdate: function() {
-    this.updateStreetImages();
+  componentWillReceiveProps: function(nextProps) {
+    this.updateStreetImages(nextProps.session);
   },
 
   selected: function(streetImage) {

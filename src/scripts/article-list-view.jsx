@@ -28,9 +28,10 @@ var ArticleListView = React.createClass({
     };
   },
 
-  updateArticles: function() {
+  updateArticles: function(nextSession) {
+    var session = nextSession || this.props.session;
     var query = new Parse.Query(Article);
-    query.equalTo('belongTo', this.props.session);
+    query.equalTo('belongTo', session);
     query.find().then(function(articles) {
       this.setState({articles: articles});
     }.bind(this));
@@ -40,8 +41,8 @@ var ArticleListView = React.createClass({
     this.updateArticles();
   },
 
-  componentWillUpdate: function() {
-    this.updateArticles();
+  componentWillReceiveProps: function(nextProps) {
+    this.updateArticles(nextProps.session);
   },
 
   selected: function(article) {
