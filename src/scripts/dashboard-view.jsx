@@ -1,8 +1,23 @@
 var React = require('react');
+var Parse = require('./app.ls').Parse;
 var Pure = require('./components/pure.jsx');
 var Form = require('./components/form.jsx');
+var Session = require('./model/session.ls');
 
 var DashboardView = React.createClass({
+
+  getInitialState: function() {
+    return {
+      sessions: []
+    };
+  },
+
+  componentDidMount: function() {
+    var query = new Parse.Query(Session);
+    query.find().then(function(sessions) {
+      this.setState({sessions: sessions});
+    }.bind(this));
+  },
 
   render: function() {
     return (
@@ -11,28 +26,35 @@ var DashboardView = React.createClass({
           <h2>Sessions</h2>
           <button>New Session</button>
           <ul>
-            <li>第一期</li>
-            <li>第二期</li>
-            <li>第三期</li>
-            <li>第四期</li>
+            {this.state.sessions.map(function(session) {
+              return <li>
+                <a href="#">
+                  {session.get('title')}
+                  {session.get('isPublished') ? '' : ' (draft)'}
+                </a>
+              </li>;
+            })}
           </ul>
         </Pure>
         <Pure u="1-5">
+          <h2>第四期 (draft)</h2>
+          <button>Publish</button>
+          <button>Delete</button>
           <h2>Articles</h2>
           <button>New Article</button>
           <ul>
-            <li>文章一</li>
-            <li>文章二</li>
-            <li>文章三</li>
-            <li>文章四</li>
+            <li><a href="#">文章一</a></li>
+            <li><a href="#">文章二</a></li>
+            <li><a href="#">文章三</a></li>
+            <li><a href="#">文章四</a></li>
           </ul>
           <h2>Street Images</h2>
           <button>New bundle</button>
           <ul>
-            <li>街拍一</li>
-            <li>街拍二</li>
-            <li>街拍三</li>
-            <li>街拍四</li>
+            <li><a href="#">街拍一</a></li>
+            <li><a href="#">街拍二</a></li>
+            <li><a href="#">街拍三</a></li>
+            <li><a href="#">街拍四</a></li>
           </ul>
         </Pure>
         <Pure u="3-5">
