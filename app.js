@@ -46850,6 +46850,7 @@ var SessionItemView = React.createClass({displayName: "SessionItemView",
     return (
       React.createElement("li", null, 
         React.createElement("a", {href: "#", onClick: this.selected}, 
+          '[' + this.props.session.get('number') + '] ', 
           this.props.session.get('title'), 
           this.props.session.get('isPublished') ? '' : ' (draft)'
         )
@@ -46869,6 +46870,7 @@ var SessionListView = React.createClass({displayName: "SessionListView",
 
   updateSessions: function() {
     var query = new Parse.Query(Session);
+    query.ascending('number');
     query.find().then(function(sessions) {
       this.setState({sessions: sessions});
     }.bind(this));
@@ -47011,6 +47013,7 @@ var StreetImageEditorView = React.createClass({displayName: "StreetImageEditorVi
     var streetImage = nextStreetImage || this.state.streetImage;
     if (!streetImage.isNew()) {
       var query = new Parse.Query(StreetDetailImage);
+      query.ascending('indexNumber');
       query.equalTo('belongTo', streetImage);
       query.find().then(function(streetDetailImages) {
         this.setState({streetDetailImages: streetDetailImages});
