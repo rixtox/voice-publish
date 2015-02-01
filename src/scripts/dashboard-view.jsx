@@ -19,12 +19,27 @@ var DashboardView = React.createClass({
     }.bind(this));
   },
 
+  newSession: function(event) {
+    var session = new Session;
+    session.set('title', '一个标题而已');
+    session.set('isPublished', true);
+    session.save();
+  },
+
+  logout: function() {
+    Parse.User.logOut();
+    this.props.loggedOut();
+  },
+
   render: function() {
     return (
       <Pure>
+        <Pure u="1">
+          <button onClick={this.logout}>Logout</button>
+        </Pure>
         <Pure u="1-5">
           <h2>Sessions</h2>
-          <button>New Session</button>
+          <button onClick={this.newSession}>New Session</button>
           <ul>
             {this.state.sessions.map(function(session) {
               return <li>

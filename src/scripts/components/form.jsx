@@ -8,7 +8,7 @@ var Form = React.createClass({
       classString += ' pure-form-aligned';
     }
     return (
-      <form className={classString}>
+      <form {...this.props} className={classString}>
         {this.props.children}
       </form>
     );
@@ -20,6 +20,14 @@ Form.Input = React.createClass({
 
   propTypes: {
     text: React.PropTypes.string
+  },
+
+  getInitialState: function() {
+    return {value: ''};
+  },
+
+  handleChange: function(event) {
+    this.setState({value: event.target.value});
   },
 
   render: function() {
@@ -39,9 +47,11 @@ Form.Input = React.createClass({
             id={this.props.tag}
             name={this.props.tag}
             className={classString}
-            type={this.props.password ? "password" : (this.props.type || "text")}
+            value={this.state.value}
+            onChange={this.handleChange}
+            placeholder={this.props.text}
             autoFocus={this.props.autoFocus}
-            placeholder={this.props.text} />
+            type={this.props.password ? "password" : (this.props.type || "text")} />
           {this.props.children}
         </div>
       </fieldset>

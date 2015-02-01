@@ -1,7 +1,7 @@
 {Parse} = require '../app.ls'
 
 Session = Parse.Object.extend do
-  'Session'
+  'SessionBeta'
   defaults:
     isPublished: false
     title: 'Untitled Session'
