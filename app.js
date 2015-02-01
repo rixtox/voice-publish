@@ -46494,7 +46494,7 @@ var ArticleListView = React.createClass({displayName: "ArticleListView",
     self = this;
     return (
       React.createElement("div", null, 
-        React.createElement("h2", null, "Articles"), 
+        React.createElement("h3", null, "Articles"), 
         React.createElement("button", {onClick: this.props.newArticle}, "New Article"), 
         React.createElement("ul", null, 
           this.state.articles.map(function(article) {
@@ -46815,7 +46815,7 @@ var SessionItemsView = React.createClass({displayName: "SessionItemsView",
       return (
         React.createElement(Pure, {u: "1-5"}, 
           React.createElement("h2", null, 
-            session.get('title'), 
+            'Session ' + session.get('number'), 
             session.get('isPublished') ? '' : ' (draft)'
           ), 
           React.createElement(ArticleListView, {
@@ -46969,7 +46969,7 @@ var StreetImageListView = React.createClass({displayName: "StreetImageListView",
     self = this;
     return (
       React.createElement("div", null, 
-        React.createElement("h2", null, "Street Images"), 
+        React.createElement("h3", null, "Street Images"), 
         React.createElement("button", {onClick: this.props.newStreetImage}, "New Bundle"), 
         React.createElement("ul", null, 
           this.state.streetImages.map(function(streetImage) {
