@@ -40,11 +40,19 @@ var ArticleEditorView = React.createClass({
   onDelete: function() {
     var self = this;
     var article = this.state.article;
-    article.destroy(function() {
+
+    if (article.isNew())
       self.props.onDelete();
-    }, function(error) {
-      alert('Article cannot be deleted!');
-    });
+    else
+      article.destroy(function() {
+        self.props.onDelete();
+      }, function(error) {
+        alert('Article cannot be deleted!');
+      });
+  },
+
+  onSubmit: function(event) {
+    event.preventDefault();
   },
 
   render: function() {
@@ -55,7 +63,7 @@ var ArticleEditorView = React.createClass({
         <h2>Edit Article</h2>
         <button onClick={this.onSave}>Save</button>
         <button onClick={this.onDelete}>Delete</button>
-        <Form>
+        <Form onSubmit={this.onSubmit}>
           <Form.Input u
             ref="title"
             tag="title"

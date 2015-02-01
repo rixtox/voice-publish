@@ -22,7 +22,7 @@ var SessionItemsView = React.createClass({
           <StreetImageListView
             session={session}
             onSelected={this.props.onStreetImageSelect}
-            newArticle={this.props.onNewStreetImage} />
+            newStreetImage={this.props.onNewStreetImage} />
         </Pure>
       );
     } else {

@@ -8,9 +8,7 @@ var Form = React.createClass({
       classString += ' pure-form-aligned';
     }
     return (
-      <form {...this.props} className={classString}>
-        {this.props.children}
-      </form>
+      <form {...this.props} className={classString} />
     );
   }
 
@@ -28,6 +26,8 @@ Form.Input = React.createClass({
 
   handleChange: function(event) {
     this.setState({value: event.target.value});
+    if (this.props.onChange)
+      this.props.onChange(event, this);
   },
 
   render: function() {
@@ -44,6 +44,7 @@ Form.Input = React.createClass({
             : null
           }
           <input
+            {...this.props}
             ref="input"
             id={this.props.tag}
             name={this.props.tag}
@@ -52,9 +53,7 @@ Form.Input = React.createClass({
             value={this.state.value}
             onChange={this.handleChange}
             placeholder={this.props.text}
-            autoFocus={this.props.autoFocus}
             type={this.props.password ? "password" : (this.props.type || "text")} />
-          {this.props.children}
         </div>
       </fieldset>
     );
@@ -77,6 +76,40 @@ Form.Button = React.createClass({
             className="pure-button pure-button-primary"
             type="submit"
             value={this.props.text} />
+        </div>
+      </fieldset>
+    );
+  }
+
+});
+
+Form.Checkbox = React.createClass({
+
+  getInitialState: function() {
+    return { value: this.props.value || false };
+  },
+
+  onChange: function() {
+    this.setState({value: !this.state.value});
+  },
+
+  propTypes: {
+    text: React.PropTypes.string
+  },
+
+  render: function() {
+    return (
+      <fieldset>
+        <div className="pure-control-group">
+          <label htmlFor={this.props.tag} class="pure-checkbox">
+              <input
+                {...this.props}
+                id={this.props.tag}
+                checked={this.state.value}
+                onChange={this.onChange}
+                type="checkbox" />
+              {this.props.text}
+          </label>
         </div>
       </fieldset>
     );

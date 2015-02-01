@@ -19,6 +19,7 @@ var SessionEditorView = React.createClass({
     session.set('who', this.refs.who.state.value);
     session.set('photoBy', this.refs.photoBy.state.value);
     session.set('number', parseInt(this.refs.number.state.value));
+    session.set('isPublished', this.refs.isPublished.state.value);
     session.save().then(function() {
       self.props.onSave(session);
     }, function(error) {
@@ -26,27 +27,22 @@ var SessionEditorView = React.createClass({
     });
   },
 
-  togglePublish: function() {
-    var self = this;
-    var session = this.state.session;
-
-    session.set('isPublished', !session.get('isPublished'));
-    session.save().then(function() {
-      self.props.onSave(session);
-    }, function(error) {
-      alert('Session publish state cannot be changed!');
-    });
-  },
-
   onDelete: function() {
     var self = this;
     var session = this.state.session;
 
-    session.destroy(function() {
+    if (session.isNew())
       self.props.onDelete();
-    }, function(error) {
-      alert('Session cannot be deleted!');
-    });
+    else
+      session.destroy(function() {
+        self.props.onDelete();
+      }, function(error) {
+        alert('Session cannot be deleted!');
+      });
+  },
+
+  onSubmit: function(event) {
+    event.preventDefault();
   },
 
   render: function() {
@@ -56,13 +52,8 @@ var SessionEditorView = React.createClass({
       <Pure u="3-5">
         <h2>Edit Session</h2>
         <button onClick={this.onSave}>Save</button>
-        {
-          session.get('isPublished')
-          ? <button onClick={this.togglePublish}>Unpublish</button>
-          : <button onClick={this.togglePublish}>Publish</button>
-        }
         <button onClick={this.onDelete}>Delete</button>
-        <Form>
+        <Form onSubmit={this.onSubmit}>
           <Form.Input u
             tag="title"
             ref="title"
@@ -84,6 +75,11 @@ var SessionEditorView = React.createClass({
             ref="number"
             text="Index number"
             value={session.get('number')} />
+          <Form.Checkbox u
+            tag="isPublished"
+            ref="isPublished"
+            text="Is published"
+            value={session.get('isPublished')} />
         </Form>
       </Pure>
     );
