@@ -23,7 +23,7 @@ Form.Input = React.createClass({
   },
 
   getInitialState: function() {
-    return {value: ''};
+    return {value: this.props.value || ''};
   },
 
   handleChange: function(event) {
@@ -44,8 +44,10 @@ Form.Input = React.createClass({
             : null
           }
           <input
+            ref="input"
             id={this.props.tag}
             name={this.props.tag}
+            title={this.props.text}
             className={classString}
             value={this.state.value}
             onChange={this.handleChange}

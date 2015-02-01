@@ -15,8 +15,6 @@ var SessionItemsView = React.createClass({
             {session.get('title')}
             {session.get('isPublished') ? '' : ' (draft)'}
           </h2>
-          <button>Publish</button>
-          <button>Delete</button>
           <ArticleListView
             session={session}
             onSelected={this.props.onArticleSelect}
@@ -28,11 +26,7 @@ var SessionItemsView = React.createClass({
         </Pure>
       );
     } else {
-      return (
-        <Pure u="1-5">
-          <h2>None</h2>
-        </Pure>
-      );
+      return null;
     }
   }
 

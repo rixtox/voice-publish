@@ -21,8 +21,11 @@ var AppView = React.createClass({
         <h1>VOICE Publish</h1>
         {
           this.state.user
-          ? <DashboardView loggedOut={this.userStateChanged}/>
-          : <LoginView loggedIn={this.userStateChanged} />
+          ? <DashboardView
+              user={this.state.user}
+              loggedOut={this.userStateChanged} />
+          : <LoginView
+              loggedIn={this.userStateChanged} />
         }
       </div>
     );

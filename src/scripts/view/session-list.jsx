@@ -41,6 +41,10 @@ var SessionListView = React.createClass({
     this.updateSessions();
   },
 
+  componentWillReceiveProps: function() {
+    this.updateSessions();
+  },
+
   selected: function(session) {
     this.props.onSelected(session);
   },

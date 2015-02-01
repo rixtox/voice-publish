@@ -4,6 +4,9 @@ var Pure = require('../components/pure.jsx');
 var Form = require('../components/form.jsx');
 var SessionListView = require('./session-list.jsx');
 var SessionItemsView = require('./session-items.jsx');
+var ArticleEditorView = require('./article-editor.jsx');
+var SessionEditorView = require('./session-editor.jsx');
+var StreetImageEditorView = require('./street-image-editor.jsx');
 var Session = require('../model/session.ls');
 
 var DashboardView = React.createClass({
@@ -17,21 +20,6 @@ var DashboardView = React.createClass({
     this.props.loggedOut();
   },
 
-  sessionSelected: function(session) {
-    this.setState({
-      selectedSession: session,
-      nowEditing: 'Session'
-    });
-  },
-
-  newSession: function(event) {
-    var session = new Session;
-    session.set('title', '一个标题而已');
-    session.set('isPublished', true);
-    session.save();
-    this.updateSessions();
-  },
-
   articleSelected: function(article) {
     this.setState({
       selectedArticle: article,
@@ -40,7 +28,50 @@ var DashboardView = React.createClass({
   },
 
   newArticle: function() {
-    
+    this.setState({
+      selectedArticle: null,
+      nowEditing: 'Article'
+    });
+  },
+
+  articleSaved: function(article) {
+    this.setState({
+      selectedArticle: article,
+    });
+  },
+
+  articleDeleted: function() {
+    this.setState({
+      selectedArticle: null,
+      nowEditing: null
+    });
+  },
+
+  sessionSelected: function(session) {
+    this.setState({
+      selectedSession: session,
+      nowEditing: 'Session'
+    });
+  },
+
+  newSession: function() {
+    this.setState({
+      selectedSession: null,
+      nowEditing: 'Session'
+    });
+  },
+
+  sessionSaved: function(session) {
+    this.setState({
+      selectedSession: session,
+    });
+  },
+
+  sessionDeleted: function(session) {
+    this.setState({
+      selectedSession: null,
+      nowEditing: null
+    });
   },
 
   streetImageSelected: function(streetImage) {
@@ -51,15 +82,60 @@ var DashboardView = React.createClass({
   },
 
   newStreetImage: function() {
-    
+    this.setState({
+      selectedStreetImage: null,
+      nowEditing: 'StreetImage'
+    });
+  },
+
+  streetImageSaved: function(streetImage) {
+    this.setState({
+      selectedStreetImage: streetImage,
+    });
+  },
+
+  streetImageDeleted: function() {
+    this.setState({
+      selectedStreetImage: null,
+      nowEditing: null
+    });
   },
 
   render: function() {
     var self = this;
+    var selectedArticle = this.state.selectedArticle;
     var selectedSession = this.state.selectedSession;
+    var selectedStreetImage = this.state.selectedStreetImage;
+    var EditorView = null;
+    switch(self.state.nowEditing) {
+      case 'Article':
+        EditorView = <ArticleEditorView
+          key={selectedArticle ? selectedArticle.id : 'newArticle'}
+          article={selectedArticle}
+          session={selectedSession}
+          onSave={self.articleSaved}
+          onDelete={self.articleDeleted} />;
+        break;
+      case 'Session':
+        EditorView = <SessionEditorView
+          key={selectedSession ? selectedSession.id : 'newSession'}
+          session={selectedSession}
+          onSave={self.sessionSaved}
+          onDelete={self.sessionDeleted} />;
+        break;
+      case 'StreetImage':
+        EditorView = <StreetImageEditorView
+          key={selectedStreetImage ? selectedStreetImage.id : 'newStreetImage'}
+          streetImage={selectedStreetImage}
+          session={selectedSession}
+          onSave={self.streetImageSaved}
+          onDelete={self.streetImageDeleted} />;
+        break;
+    }
     return (
       <Pure>
         <Pure u="1">
+          <p>Welcome, {this.props.user.getUsername()}</p>
           <button onClick={this.logout}>Logout</button>
         </Pure>
         <SessionListView
@@ -71,20 +147,7 @@ var DashboardView = React.createClass({
           onNewArticle={this.newArticle}
           onStreetImageSelect={this.streetImageSelected}
           onNewStreetImage={this.newStreetImage} />
-        <Pure u="3-5">
-          <h2>Edit Article</h2>
-          <button>Save</button>
-          <button>Discard</button>
-          <button>Delete</button>
-          <Form>
-            <Form.Input tag="title" u autoFocus text="Title" />
-            <Form.Input tag="author" u text="Author" />
-            <Form.Input tag="url" u text="URL" />
-            <Form.Input tag="briefImage" u type="file">
-              <img src="http://files.parsetfss.com/5070786f-618a-4706-81d7-f1da861a1d4c/tfss-cb65a89e-723f-43de-9130-74c159cb04bc-11-pic-1-1.jpg" />
-            </Form.Input>
-          </Form>
-        </Pure>
+        {EditorView}
       </Pure>
     );
   }
