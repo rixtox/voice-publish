@@ -84,6 +84,8 @@ var ArticleEditorView = React.createClass({
             ref="briefImage"
             tag="briefImage"
             type="file" >
+            <p>Cover Image</p>
+            <p>{'（推荐尺寸：640*250 Pixels）'}</p>
             <img src={briefImage ? briefImage.url() : null} />
           </Form.Input>
         </Form>

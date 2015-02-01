@@ -13,6 +13,7 @@ var SessionItemView = React.createClass({
     return (
       <li>
         <a href="#" onClick={this.selected}>
+          {'[' + this.props.session.get('number') + '] '}
           {this.props.session.get('title')}
           {this.props.session.get('isPublished') ? '' : ' (draft)'}
         </a>
@@ -32,6 +33,7 @@ var SessionListView = React.createClass({
 
   updateSessions: function() {
     var query = new Parse.Query(Session);
+    query.ascending('number');
     query.find().then(function(sessions) {
       this.setState({sessions: sessions});
     }.bind(this));

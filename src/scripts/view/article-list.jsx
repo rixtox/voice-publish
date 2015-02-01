@@ -53,7 +53,7 @@ var ArticleListView = React.createClass({
     self = this;
     return (
       <div>
-        <h2>Articles</h2>
+        <h3>Articles</h3>
         <button onClick={this.props.newArticle}>New Article</button>
         <ul>
           {this.state.articles.map(function(article) {

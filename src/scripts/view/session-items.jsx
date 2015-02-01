@@ -12,7 +12,7 @@ var SessionItemsView = React.createClass({
       return (
         <Pure u="1-5">
           <h2>
-            {session.get('title')}
+            {'Session ' + session.get('number')}
             {session.get('isPublished') ? '' : ' (draft)'}
           </h2>
           <ArticleListView

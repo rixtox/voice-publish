@@ -53,7 +53,7 @@ var StreetImageListView = React.createClass({
     self = this;
     return (
       <div>
-        <h2>Street Images</h2>
+        <h3>Street Images</h3>
         <button onClick={this.props.newStreetImage}>New Bundle</button>
         <ul>
           {this.state.streetImages.map(function(streetImage) {

@@ -24,6 +24,7 @@ var StreetImageEditorView = React.createClass({
     var streetImage = nextStreetImage || this.state.streetImage;
     if (!streetImage.isNew()) {
       var query = new Parse.Query(StreetDetailImage);
+      query.ascending('indexNumber');
       query.equalTo('belongTo', streetImage);
       query.find().then(function(streetDetailImages) {
         this.setState({streetDetailImages: streetDetailImages});
@@ -161,6 +162,7 @@ var StreetImageEditorView = React.createClass({
             tag="coverImage"
             type="file" >
             <p>Cover Image</p>
+            <p>{'（推荐尺寸：800*1200 Pixels）'}</p>
             <img src={coverImage ? coverImage.url() : null} />
           </Form.Input>
           {this.state.streetDetailImages.map(function(streetDetailImage) {
@@ -176,6 +178,7 @@ var StreetImageEditorView = React.createClass({
                     Remove Image
                   </button>
                 </div>
+                <p>{'（推荐尺寸：800*1200 Pixels）'}</p>
                 <img src={image ? image.url() : null} />
               </Form.Input>
             );
