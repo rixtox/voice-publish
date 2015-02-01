@@ -2,28 +2,14 @@ var React = require('react');
 var Parse = require('./app.ls').Parse;
 var Pure = require('./components/pure.jsx');
 var Form = require('./components/form.jsx');
+var SessionListView = require('./session-list-view.jsx');
+var SessionItemsView = require('./session-items-view.jsx');
 var Session = require('./model/session.ls');
 
 var DashboardView = React.createClass({
 
   getInitialState: function() {
-    return {
-      sessions: []
-    };
-  },
-
-  componentDidMount: function() {
-    var query = new Parse.Query(Session);
-    query.find().then(function(sessions) {
-      this.setState({sessions: sessions});
-    }.bind(this));
-  },
-
-  newSession: function(event) {
-    var session = new Session;
-    session.set('title', '一个标题而已');
-    session.set('isPublished', true);
-    session.save();
+    return {};
   },
 
   logout: function() {
@@ -31,47 +17,60 @@ var DashboardView = React.createClass({
     this.props.loggedOut();
   },
 
+  sessionSelected: function(session) {
+    this.setState({
+      selectedSession: session,
+      nowEditing: 'Session'
+    });
+  },
+
+  newSession: function(event) {
+    var session = new Session;
+    session.set('title', '一个标题而已');
+    session.set('isPublished', true);
+    session.save();
+    this.updateSessions();
+  },
+
+  articleSelected: function(article) {
+    this.setState({
+      selectedArticle: article,
+      nowEditing: 'Article'
+    });
+  },
+
+  newArticle: function() {
+    
+  },
+
+  streetImageSelected: function(streetImage) {
+    this.setState({
+      selectedStreetImage: streetImage,
+      nowEditing: 'StreetImage'
+    });
+  },
+
+  newStreetImage: function() {
+    
+  },
+
   render: function() {
+    var self = this;
+    var selectedSession = this.state.selectedSession;
     return (
       <Pure>
         <Pure u="1">
           <button onClick={this.logout}>Logout</button>
         </Pure>
-        <Pure u="1-5">
-          <h2>Sessions</h2>
-          <button onClick={this.newSession}>New Session</button>
-          <ul>
-            {this.state.sessions.map(function(session) {
-              return <li>
-                <a href="#">
-                  {session.get('title')}
-                  {session.get('isPublished') ? '' : ' (draft)'}
-                </a>
-              </li>;
-            })}
-          </ul>
-        </Pure>
-        <Pure u="1-5">
-          <h2>第四期 (draft)</h2>
-          <button>Publish</button>
-          <button>Delete</button>
-          <h2>Articles</h2>
-          <button>New Article</button>
-          <ul>
-            <li><a href="#">文章一</a></li>
-            <li><a href="#">文章二</a></li>
-            <li><a href="#">文章三</a></li>
-            <li><a href="#">文章四</a></li>
-          </ul>
-          <h2>Street Images</h2>
-          <button>New bundle</button>
-          <ul>
-            <li><a href="#">街拍一</a></li>
-            <li><a href="#">街拍二</a></li>
-            <li><a href="#">街拍三</a></li>
-            <li><a href="#">街拍四</a></li>
-          </ul>
-        </Pure>
+        <SessionListView
+          onSelected={this.sessionSelected}
+          newSession={this.newSession} />
+        <SessionItemsView
+          session={selectedSession}
+          onArticleSelect={this.articleSelected}
+          onNewArticle={this.newArticle}
+          onStreetImageSelect={this.streetImageSelected}
+          onNewStreetImage={this.newStreetImage} />
         <Pure u="3-5">
           <h2>Edit Article</h2>
           <button>Save</button>

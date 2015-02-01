@@ -1,13 +1,13 @@
 React = require 'react'
 {Parse} = require 'parse'
 $ = Parse.$ = require 'jquery'
-config = require '../../config.ls'
+Config = require '../../config.ls'
 
 Parse.initialize do
-  config.Parse['Application ID']
-  config.Parse['JavaScript Key']
+  Config.Parse['Application ID']
+  Config.Parse['JavaScript Key']
 
-module.exports = App = {Parse, config}
+module.exports = App = {Parse, Config}
 
 $ ->
   React.render do

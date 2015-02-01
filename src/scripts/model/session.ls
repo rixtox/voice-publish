@@ -1,7 +1,8 @@
-{Parse} = require '../app.ls'
+App = require '../app.ls'
+{Parse, Config} = App
 
 Session = Parse.Object.extend do
-  'SessionBeta'
+  Config.Model.Session
   defaults:
     isPublished: false
     title: 'Untitled Session'
