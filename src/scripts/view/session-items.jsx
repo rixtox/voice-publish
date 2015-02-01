@@ -1,7 +1,7 @@
 var React = require('react');
-var Pure = require('./components/pure.jsx');
-var ArticleListView = require('./article-list-view.jsx');
-var StreetImageListView = require('./stree-image-list-view.jsx');
+var Pure = require('../components/pure.jsx');
+var ArticleListView = require('./article-list.jsx');
+var StreetImageListView = require('./stree-image-list.jsx');
 
 var SessionItemsView = React.createClass({
 

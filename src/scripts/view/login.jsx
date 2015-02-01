@@ -1,6 +1,6 @@
 var React = require('react');
-var App = require('./app.ls');
-var Form = require('./components/form.jsx');
+var App = require('../app.ls');
+var Form = require('../components/form.jsx');
 
 var Parse = App.Parse;
 

@@ -12,5 +12,5 @@ module.exports = App = {Parse, Config}
 $ ->
   React.render do
     React.createElement do
-      require './app-view.jsx'
+      require './view/app.jsx'
     document.body

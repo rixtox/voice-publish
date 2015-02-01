@@ -1,7 +1,7 @@
-var App = require('./app.ls');
+var App = require('../app.ls');
 var React = require('react');
-var LoginView = require('./login-view.jsx');
-var DashboardView = require('./dashboard-view.jsx');
+var LoginView = require('./login.jsx');
+var DashboardView = require('./dashboard.jsx');
 
 var Parse = App.Parse;
 

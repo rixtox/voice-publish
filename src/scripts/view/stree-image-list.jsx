@@ -1,6 +1,6 @@
 var React = require('react');
-var Parse = require('./app.ls').Parse;
-var StreetImage = require('./model/street-image.ls');
+var Parse = require('../app.ls').Parse;
+var StreetImage = require('../model/street-image.ls');
 
 var StreetImageItemView = React.createClass({
 

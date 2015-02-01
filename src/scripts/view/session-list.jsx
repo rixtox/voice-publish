@@ -1,7 +1,7 @@
 var React = require('react');
-var Parse = require('./app.ls').Parse;
-var Pure = require('./components/pure.jsx');
-var Session = require('./model/session.ls');
+var Parse = require('../app.ls').Parse;
+var Pure = require('../components/pure.jsx');
+var Session = require('../model/session.ls');
 
 var SessionItemView = React.createClass({
 

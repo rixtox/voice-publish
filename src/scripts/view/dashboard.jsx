@@ -1,10 +1,10 @@
 var React = require('react');
-var Parse = require('./app.ls').Parse;
-var Pure = require('./components/pure.jsx');
-var Form = require('./components/form.jsx');
-var SessionListView = require('./session-list-view.jsx');
-var SessionItemsView = require('./session-items-view.jsx');
-var Session = require('./model/session.ls');
+var Parse = require('../app.ls').Parse;
+var Pure = require('../components/pure.jsx');
+var Form = require('../components/form.jsx');
+var SessionListView = require('./session-list.jsx');
+var SessionItemsView = require('./session-items.jsx');
+var Session = require('../model/session.ls');
 
 var DashboardView = React.createClass({
 

@@ -1,6 +1,6 @@
 var React = require('react');
-var Parse = require('./app.ls').Parse;
-var Article = require('./model/article.ls');
+var Parse = require('../app.ls').Parse;
+var Article = require('../model/article.ls');
 
 var ArticleItemView = React.createClass({
 
