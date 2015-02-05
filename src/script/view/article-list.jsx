@@ -1,8 +1,12 @@
 var React = require('react');
-var Parse = require('../app.ls').Parse;
+var {Parse} = require('../app.ls');
+var Router = require('react-router');
 var Article = require('../model/article.ls');
+var Session = require('../model/session.ls');
 
-var ArticleItemView = React.createClass({
+var {RouteHandler} = Router;
+
+var ArticleItem = React.createClass({
 
   selected: function() {
     this.props.onSelected(this.props.article);
@@ -21,6 +25,7 @@ var ArticleItemView = React.createClass({
 });
 
 var ArticleListView = React.createClass({
+  mixins: [Router.State],
 
   getInitialState: function() {
     return {
@@ -29,7 +34,8 @@ var ArticleListView = React.createClass({
   },
 
   updateArticles: function(nextSession) {
-    var session = nextSession || this.props.session;
+    var session = new Session;
+    session.id = this.getParams().sessionId;
     var query = new Parse.Query(Article);
     query.equalTo('belongTo', session);
     query.find().then(function(articles) {
@@ -58,7 +64,7 @@ var ArticleListView = React.createClass({
         <ul>
           {this.state.articles.map(function(article) {
             return (
-              <ArticleItemView
+              <ArticleItem
                 key={article.id}
                 article={article}
                 onSelected={self.selected} />

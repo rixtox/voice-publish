@@ -10,9 +10,9 @@ var Pure = React.createClass({
       classString += 'g';
     }
     return (
-      <div className={classString}>
-        {this.props.children}
-      </div>
+      <div
+        {...this.props}
+        className={classString}/>
     );
   }
 

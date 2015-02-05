@@ -1,29 +1,30 @@
 var React = require('react');
-var Parse = require('../app.ls').Parse;
+var App = require('../app.ls');
+var Router = require('react-router');
 var Pure = require('../components/pure.jsx');
 var Session = require('../model/session.ls');
 
-var SessionItemView = React.createClass({
+var {Parse, Mixin} = App,
+    {Link, RouteHandler} = Router;
 
-  selected: function() {
-    this.props.onSelected(this.props.session);
-  },
+var SessionItem = React.createClass({
 
   render: function() {
     return (
       <li>
-        <a href="#" onClick={this.selected}>
+        <Link to={'/session/' + this.props.session.id + '/'}>
           {'[' + this.props.session.get('number') + '] '}
           {this.props.session.get('title')}
           {this.props.session.get('isPublished') ? '' : ' (draft)'}
-        </a>
+        </Link>
       </li>
     );
   }
 
 });
 
-var SessionListView = React.createClass({
+var SessionList = React.createClass({
+  mixins: [ Mixin.Auth ],
 
   getInitialState: function() {
     return {
@@ -47,23 +48,18 @@ var SessionListView = React.createClass({
     this.updateSessions();
   },
 
-  selected: function(session) {
-    this.props.onSelected(session);
-  },
-
   render: function() {
     self = this;
     return (
       <Pure u="1-5">
         <h2>Sessions</h2>
-        <button onClick={this.props.newSession}>New Session</button>
+        <Link to="/edit/session">New Session</Link>
         <ul>
           {this.state.sessions.map(function(session) {
             return (
-              <SessionItemView
+              <SessionItem
                 key={session.id}
-                session={session}
-                onSelected={self.selected} />
+                session={session} />
             );
           })}
         </ul>
@@ -73,4 +69,4 @@ var SessionListView = React.createClass({
 
 });
 
-module.exports = SessionListView;
+module.exports = SessionList;

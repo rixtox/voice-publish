@@ -4,7 +4,7 @@ var Pure = require('../components/pure.jsx');
 var Form = require('../components/form.jsx');
 var Article = require('../model/article.ls');
 
-var ArticleEditorView = React.createClass({
+var ArticleEditor = React.createClass({
 
   getInitialState: function() {
     if (this.props.article) {
@@ -95,4 +95,4 @@ var ArticleEditorView = React.createClass({
 
 });
 
-module.exports = ArticleEditorView;
+module.exports = ArticleEditor;

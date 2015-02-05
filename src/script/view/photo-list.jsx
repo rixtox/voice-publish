@@ -1,8 +1,13 @@
 var React = require('react');
-var Parse = require('../app.ls').Parse;
+var App = require('../app.ls');
+var Router = require('react-router');
 var StreetImage = require('../model/street-image.ls');
 
-var StreetImageItemView = React.createClass({
+var {Parse} = App;
+var {RouteHandler} = Router;
+
+var StreetImageItem = React.createClass({
+  mixins: [App.Mixin.Auth],
 
   selected: function() {
     this.props.onSelected(this.props.streetImage);
@@ -20,7 +25,7 @@ var StreetImageItemView = React.createClass({
 
 });
 
-var StreetImageListView = React.createClass({
+var StreetImageList = React.createClass({
 
   getInitialState: function() {
     return {
@@ -58,7 +63,7 @@ var StreetImageListView = React.createClass({
         <ul>
           {this.state.streetImages.map(function(streetImage) {
             return (
-              <StreetImageItemView
+              <StreetImageItem
                 key={streetImage.id}
                 streetImage={streetImage}
                 onSelected={self.selected} />
@@ -71,4 +76,4 @@ var StreetImageListView = React.createClass({
 
 });
 
-module.exports = StreetImageListView;
+module.exports = StreetImageList;

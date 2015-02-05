@@ -6,7 +6,7 @@ var Form = require('../components/form.jsx');
 var StreetImage = require('../model/street-image.ls');
 var StreetDetailImage = require('../model/street-detail-image.ls');
 
-var StreetImageEditorView = React.createClass({
+var StreetImageEditor = React.createClass({
 
   getInitialState: function() {
     var streetImage = this.props.streetImage;
@@ -191,4 +191,4 @@ var StreetImageEditorView = React.createClass({
 
 });
 
-module.exports = StreetImageEditorView;
+module.exports = StreetImageEditor;

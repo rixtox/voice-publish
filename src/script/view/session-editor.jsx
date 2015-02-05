@@ -3,7 +3,7 @@ var Pure = require('../components/pure.jsx');
 var Form = require('../components/form.jsx');
 var Session = require('../model/session.ls');
 
-var SessionEditorView = React.createClass({
+var SessionEditor = React.createClass({
 
   getInitialState: function() {
     return {
@@ -87,4 +87,4 @@ var SessionEditorView = React.createClass({
 
 });
 
-module.exports = SessionEditorView;
+module.exports = SessionEditor;

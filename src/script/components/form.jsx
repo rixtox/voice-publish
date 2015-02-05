@@ -73,8 +73,9 @@ Form.Button = React.createClass({
         <div className="pure-control-group">
           <label />
           <input
+            {...this.props}
             className="pure-button pure-button-primary"
-            type="submit"
+            type={this.props.type || "button"}
             value={this.props.text} />
         </div>
       </fieldset>

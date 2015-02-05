@@ -3,7 +3,9 @@ module.exports =
     'Application ID': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     'JavaScript Key': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
   Model:
-    Article: 'ArticleBeta'
-    Session: 'SessionBeta'
-    StreetImage: 'StreetImageBeta'
-    StreetDetailImage: 'StreetDetailImageBeta'
+    Article: 'Article'
+    Session: 'Session'
+    StreetImage: 'StreetImage'
+    StreetDetailImage: 'StreetDetailImage'
+  CDN:
+    CKEditor: '//cdn.ckeditor.com/4.4.7/standard/ckeditor.js'

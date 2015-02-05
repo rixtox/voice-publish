@@ -4,19 +4,26 @@
   "description": "VOICE Magazine Parse Backend Publish System",
   "author": "rix <i@rix.li> (http://rix.li/)",
   "license": "MIT",
+  "scripts": {
+    "start": "webpack-dev-server --content-base public --hot --progress --colors --inline"
+  },
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-browserify": "^3.3.0",
-    "grunt-contrib-clean": "^0.6.0",
-    "grunt-contrib-copy": "^0.7.0",
-    "grunt-contrib-stylus": "^0.20.0",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-react": "^0.10.0",
+    "autoprefixer-loader": "^1.1.0",
+    "css-loader": "~0.7.1",
+    "file-loader": "~0.7.2",
+    "font-awesome": "^4.3.0",
+    "jade-loader": "~0.6.1",
     "jquery": "^2.1.3",
-    "liveify": "^2.0.0",
-    "load-grunt-tasks": "^3.1.0",
+    "jsx-loader": "^0.12.2",
+    "less-loader": "~0.7.5",
+    "livescript-loader": "^0.1.3",
     "parse": "^1.3.4",
     "q": "^1.1.2",
-    "react": "^0.12.2"
+    "react": "^0.12.2",
+    "react-router": "^0.11.6",
+    "style-loader": "~0.7.0",
+    "url-loader": "~0.5.5",
+    "webpack": "^1.3.0",
+    "webpack-dev-server": "^1.7.0"
   }
 }
