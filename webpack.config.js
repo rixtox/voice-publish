@@ -5,7 +5,11 @@ var context = __dirname;
 
 module.exports = {
   context: context,
-  entry: './src/entry.ls',
+  entry: [
+    'font-awesome/less/font-awesome.less',
+    './src/style/main.less',
+    './src/script/app.ls'
+  ],
   output: {
     path: path.join(context, 'dist'),
     filename: 'bundle-[hash].js'
