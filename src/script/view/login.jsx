@@ -1,6 +1,6 @@
 var React = require('react');
-var {Parse} = require('../app.ls');
 var Router = require('react-router');
+var {Parse} = require('../app.ls');
 
 var Link = Router.Link,
     Route = Router.Route,
@@ -20,11 +20,16 @@ var Login = React.createClass({
     };
   },
 
+  componentWillMount: function () {
+    if (Parse.User.current())
+      this.transitionTo('/');
+  },
+
   login: function(event) {
     event.preventDefault();
     self = this;
-    var user = self.refs.user.state.value;
-    var pass = self.refs.pass.state.value;
+    var user = self.refs.user.getDOMNode().value;
+    var pass = self.refs.pass.getDOMNode().value;
     Parse.User.logIn(user, pass, {
       success: function(user) {
         if (Login.attemptedTransition) {
@@ -42,14 +47,15 @@ var Login = React.createClass({
   },
 
   render: function () {
-    if (this.state.error) {
-      var errorMessage = (
-        <div className="error-message">
-          {"Error: " + this.state.error.code + " " + this.state.error.message}
-        </div>
-      );
-    } else
-      var errorMessage = '';
+    var errorMessage = this.state.error
+    ? (
+      <div className="login-err-panel">
+        <i className="login-icon fa fa-exclamation-circle"></i>
+        <span>Invalid login credentials.</span>
+      </div>
+    )
+    : null;
+
     return (
       <div className="login">
         <div className="banner">
@@ -57,20 +63,20 @@ var Login = React.createClass({
             <div className="login-frame">
               <h2>Login</h2>
               <form onSubmit={this.login}>
+                {errorMessage}
                 <div className="login-input-panel">
                   <div className="login-input">
-                    <i className="icon-login fa fa-user"></i>
+                    <i className="login-icon fa fa-user"></i>
                     <input ref="user" type="text" placeholder="Username" autoFocus/>
                   </div>
                   <div className="login-input">
-                    <i className="icon-login fa fa-lock"></i>
+                    <i className="login-icon fa fa-lock"></i>
                     <input ref="pass" type="password" placeholder="Password"/>
                   </div>
                 </div>
                 <div className="login-btn-panel">
-                  <a className="btn-login" href="javascript:">Login</a>
+                  <input type="submit" className="login-btn" href="javascript:" onClick={this.login} value="Login"/>
                 </div>
-                {errorMessage}
               </form>
             </div>
           </div>

@@ -1,9 +1,13 @@
 var React = require('react');
 var {Parse} = require('../app.ls');
+var Router = require('react-router');
 
 var Logout = React.createClass({
-  componentDidMount: function () {
+  mixins: [ Router.Navigation ],
+
+  componentWillMount: function () {
     Parse.User.logOut();
+    this.transitionTo('/');
   },
 
   render: function () {

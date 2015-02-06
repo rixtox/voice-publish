@@ -9,16 +9,11 @@ var AppView = React.createClass({
 
   render: function() {
     var navAccount = App.Mixin.Auth.getUser()
-    ? ([
-      <li>{App.Mixin.Auth.getUser().getUsername()}</li>,
+    ? (
       <li>
         <Link to="/logout">Logout</Link>
       </li>
-    ]) : ([
-      <li>
-        <Link to="/login">Login</Link>
-      </li>
-    ]);
+    ) : null;
     
     return (
       <div className="container">

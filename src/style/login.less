@@ -6,16 +6,83 @@
     .inner {
       height: 460px;
       position: relative;
-
-      .login-frame {
-        float: right;
-        width: 316px;
-        margin-top: 25px;
-        padding: 25px 35px 20px;
-        border-radius: 2px;
-        box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
-        background-color: #FFF;
-      }
     }
   }
 }
+
+.login-frame {
+  float: right;
+  width: 376px;
+  margin-top: 50px;
+  padding: 25px 35px 20px;
+  border-radius: 2px;
+  box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
+  background-color: #FFF;
+}
+
+.login-err-panel {
+  margin-top: 10px;
+  color: #e15f63;
+  .login-icon {
+    margin-right: 5px;
+  }
+}
+
+.login-input-panel {
+  margin-top: 15px;
+}
+
+.login-input {
+  position: relative;
+  padding: 3px 0 3px 40px;
+  border: 1px solid #e7e7eb;
+  margin-top: -1px;
+
+  .login-icon {
+    position: absolute;
+    left: 15px;
+    top: 54%;
+    margin-top: -11px;
+    width: 16px;
+    height: 18px;
+    font-size: 1.25em;
+    color: #CBCBCB;
+    vertical-align: middle;
+    display: inline-block;
+  }
+
+  input {
+    boder: none;
+    padding: 11px 0;
+    vertical-align: middle;
+    width: 100%;
+  }
+}
+
+.login-btn-panel {
+  margin-top: 20px;
+  margin-buttom: 10px;
+
+  .login-btn {
+    display: inline-block;
+    overflow: visible;
+    vertical-align: middle;
+    text-align: center;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-width: 1px;
+    border-style: solid;
+    cursor: pointer;
+    background-color: #44b549;
+    background-image: linear-gradient(to bottom,#44b549 0,#44b549 100%);
+    border-color: #44b549;
+    color: #fff;
+    height: 35px;
+    line-height: 33px;
+    width: 120px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+

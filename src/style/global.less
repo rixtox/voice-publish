@@ -3,12 +3,18 @@
   padding: 0;
   box-sizing: border-box;
   border: none;
+  outline: none;
 }
 
 html {
   font-family: proxima-nova, "Helvetica Neue", "Hiragino Sans GB", "Microsoft YaHei", "\9ED1\4F53", Arial, sans-serif;
   color: #484848;
   line-height: 1.28;
+}
+
+input {
+  font-size: 1em;
+  font-family: proxima-nova, "Helvetica Neue", "Hiragino Sans GB", "Microsoft YaHei", "\9ED1\4F53", Arial, sans-serif;
 }
 
 a {
@@ -34,7 +40,7 @@ ul, li {
 }
 
 .container {
-  padding-top: 50px;
+  padding-top: @nav-height;
   min-width: 960px;
 }
 
