@@ -1,14 +1,20 @@
 var path = require('path');
-var context = path.join(__dirname, 'public');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+
+var context = __dirname;
 
 module.exports = {
   context: context,
-  entry: '../src/entry.ls',
+  entry: './src/entry.ls',
   output: {
-    path: path.join(context, 'assets'),
-    publicPath: 'assets/',
-    filename: 'bundle.js'
+    path: path.join(context, 'dist'),
+    filename: 'bundle-[hash].js'
   },
+  plugins: [
+  	new HtmlWebpackPlugin({
+  		template: './src/assets/index.html'
+  	})
+  ],
   externals:[{
     xmlhttprequest: '{XMLHttpRequest:XMLHttpRequest}'
   }],
