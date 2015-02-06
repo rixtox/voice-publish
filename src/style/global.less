@@ -12,13 +12,17 @@ html {
   line-height: 1.28;
 }
 
+body {
+  background-color: @body-bg-color;
+}
+
 input {
   font-size: 1em;
   font-family: proxima-nova, "Helvetica Neue", "Hiragino Sans GB", "Microsoft YaHei", "\9ED1\4F53", Arial, sans-serif;
 }
 
 a {
-  color: @color-theme;
+  color: @theme-color;
   text-decoration: none;
 }
 
@@ -45,7 +49,7 @@ ul, li {
 }
 
 .wrap {
-  width: 960px;
+  width: @content-width;
   margin-left: auto;
   margin-right: auto;
   padding-left: 20px;

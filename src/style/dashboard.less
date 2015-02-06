@@ -1,0 +1,114 @@
+.dashboard {
+  width: @content-width;
+  margin: 36px auto 88px;
+  border: 1px solid #d9dadc;
+  background-color: #fff;
+  overflow: hidden;
+
+  .menu {
+    display: table;
+    border-bottom: 1px solid #d9dadc;
+    border-collapse: separate;
+    border-spacing: 20px 10px;
+
+    .wrap > * {
+      display: table-cell;
+      vertical-align: middle;
+    }
+
+    .title {
+      margin-right: 20px;
+      font-size: 1.8em;
+    }
+
+    .btn-back {
+      font-size: 2em;
+    }
+
+    .btn-add {
+      color: #fff;
+      background-color: @theme-color;
+      border-radius: 5px;
+      padding: 8px 14px 5px 10px;
+
+      .btn-icon {
+        margin: 0 5px;
+      }
+    }
+  }
+
+  .inner {
+    padding-top: 30px;
+    padding-bottom: 20px;
+
+    .selection {
+      padding: 0 50px;
+
+      a {
+        margin-right: 20px;
+        padding: 0 10px;
+      }
+
+      .option {
+        display: inline-block;
+        font-size: 1.5em;
+      }
+
+      .active {
+        border-bottom: 4px solid @theme-color;
+      }
+    }
+
+    .item {
+      width: 300px;
+      height: 500px;
+      margin: 30px 42px;
+      position: relative;
+      display: inline-block;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+
+      .link {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+      }
+
+      .title {
+        bottom: 0;
+        width: 100%;
+        padding: 10px 0;
+        color: #FFF;
+        position: absolute;
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0.8);
+      }
+
+      .controls {
+        top: 0;
+        right: 0;
+        opacity: 0;
+        padding: 5px;
+        margin: 5px 0;
+        position: absolute;
+        transition: opacity .2s ease;
+
+        .control-btn {
+          color: #FFF;
+          margin: 0 4px;
+          padding: 10px;
+          font-size: 1.3em;
+          border-radius: 5px;
+          background-color: rgba(0, 0, 0, 0.8);
+        }
+      }
+
+      &:hover {
+        .controls {
+          opacity: 1;
+        }
+      }
+    }
+  }
+}

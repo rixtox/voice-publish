@@ -17,16 +17,18 @@ var Route = Router.Route,
 var routes = (
   <Route path="/" handler={App}>
     <DefaultRoute handler={SessionList}/>
-    <Route path="sessions" handler={SessionList}/>
+    <Route path="sessions/?" handler={SessionList}/>
     <Route path="session/:sessionId" handler={SessionDetails}>
       <Route name="photos" handler={PhotoList}/>
       <Route name="articles" path="articles" handler={ArticleList}/>
       <Route name="session-default" path="/session/:sessionId/?" handler={ArticleList}/>
     </Route>
     <Route path="edit" handler={Editor}>
-      <Route path="session/:sessionId?" handler={Editor.Session}/>
-      <Route path="article/:articleId?" handler={Editor.Article}/>
-      <Route path="photo/:photoId?" handler={Editor.Photo}/>
+      <Route path="session/:sessionId" handler={Editor.Session}>
+        <Route path="article/:articleId?" handler={Editor.Article}/>
+        <Route path="photo/:photoId?" handler={Editor.Photo}/>
+      </Route>
+      <Route path="session/?" handler={Editor.Session}/>
     </Route>
     <Route name="login" path="login" handler={Login}/>
     <Route name="logout" path="logout" handler={Logout}/>

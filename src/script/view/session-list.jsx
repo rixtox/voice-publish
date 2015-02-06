@@ -3,21 +3,40 @@ var App = require('../app.ls');
 var Router = require('react-router');
 var Pure = require('../components/pure.jsx');
 var Session = require('../model/session.ls');
+var Article = require('../model/article.ls');
 
-var {Parse, Mixin} = App,
+var {Parse, Mixin, Config} = App,
     {Link, RouteHandler} = Router;
 
 var SessionItem = React.createClass({
 
   render: function() {
+    if (this.props.article)
+      var imgFile = this.props.article.get('briefImage');
+    var imgUrl = imgFile ? imgFile.url() : '';
+
     return (
-      <li>
-        <Link to={'/session/' + this.props.session.id + '/'}>
-          {'[' + this.props.session.get('number') + '] '}
-          {this.props.session.get('title')}
-          {this.props.session.get('isPublished') ? '' : ' (draft)'}
-        </Link>
-      </li>
+      <div
+        className="item"
+        style={{backgroundImage: 'url(' + imgUrl + ')'}}>
+        <Link
+          className="link"
+          title="Details"
+          to={'/session/' + this.props.session.id + '/'}/>
+        <div className="title">
+          {'Session ' + this.props.session.get('number')}
+        </div>
+        <div className="controls">
+          <a
+            className="control-btn fa fa-trash-o"
+            title="Delete"
+            href="javascript:"/>
+          <Link
+            className="control-btn fa fa-pencil"
+            title="Edit"
+            to={'/edit/session/' + this.props.session.id}/>
+        </div>
+      </div>
     );
   }
 
@@ -28,16 +47,30 @@ var SessionList = React.createClass({
 
   getInitialState: function() {
     return {
-      sessions: []
+      sessions: [],
+      articles: {}
     };
   },
 
   updateSessions: function() {
+    var self = this;
     var query = new Parse.Query(Session);
-    query.ascending('number');
+    query.descending('number');
     query.find().then(function(sessions) {
-      this.setState({sessions: sessions});
-    }.bind(this));
+      sessions.map(function(session) {
+        var query = new Parse.Query(Article);
+        query.equalTo('belongTo', session);
+        query.descending("createdAt");
+        query.first({
+          success: function(article) {
+            var articles = self.state.articles;
+            articles[session.id] = article;
+            self.setState({articles: articles});
+          }
+        });
+      });
+      self.setState({sessions: sessions});
+    });
   },
 
   componentDidMount: function() {
@@ -49,21 +82,31 @@ var SessionList = React.createClass({
   },
 
   render: function() {
-    self = this;
+    var self = this;
+    var sessions = this.state.sessions;
+    var articles = this.state.articles;
     return (
-      <Pure u="1-5">
-        <h2>Sessions</h2>
-        <Link to="/edit/session">New Session</Link>
-        <ul>
-          {this.state.sessions.map(function(session) {
+      <div className="dashboard">
+        <div className="menu">
+          <div className="wrap">
+            <h1 className="title">Sessions</h1>
+            <Link className="btn-add" to="/edit/session/">
+              <i className="btn-icon fa fa-plus"></i>
+              Add
+            </Link>
+          </div>
+        </div>
+        <div className="inner wrap">
+          {sessions.map(function(session) {
             return (
               <SessionItem
                 key={session.id}
-                session={session} />
+                session={session}
+                article={articles[session.id]} />
             );
           })}
-        </ul>
-      </Pure>
+        </div>
+      </div>
     );
   }
 
