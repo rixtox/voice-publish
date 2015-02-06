@@ -29,14 +29,22 @@ module.exports = function(grunt) {
 
     'webpack-dev-server': {
       options: {
+        keepalive: true,
         webpack: webpackConfig,
         contentBase: webpackConfig.output.path
       },
       start: {
-        keepAlive: true,
         webpack: {
+          debug: true,
           devtool: 'eval',
-          debug: true
+          entry: [require.resolve('webpack-dev-server/client/')
+                  + '?http://localhost:8080',
+                  'webpack/hot/dev-server'
+                  ].concat(webpackConfig.entry),
+          plugins: webpackConfig.plugins.concat(
+            new webpack.HotModuleReplacementPlugin(),
+            new webpack.NoErrorsPlugin()
+          )
         }
       }
     },
