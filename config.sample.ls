@@ -9,3 +9,5 @@ module.exports =
     StreetDetailImage: 'StreetDetailImage'
   CDN:
     CKEditor: '//cdn.ckeditor.com/4.4.7/standard/ckeditor.js'
+  Url:
+    Preview: 'http://edit.imvoice.me/preview/'
