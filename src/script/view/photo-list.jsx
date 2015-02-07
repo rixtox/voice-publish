@@ -1,8 +1,8 @@
 var React = require('react');
 var App = require('../app.ls');
 var Router = require('react-router');
-var StreetImage = require('../model/street-image.ls');
 var Session = require('../model/session.ls');
+var StreetImage = require('../model/street-image.ls');
 
 var {Parse, Config} = App;
 var {RouteHandler, Link} = Router;
@@ -11,8 +11,8 @@ var StreetImageItem = React.createClass({
   mixins: [Router.State],
 
   render: function() {
-    var imgFile = this.props.streetImage.get('image');
-    var imgUrl = imgFile ? imgFile.url() : '';
+    var image = this.props.streetImage.get('coverImage');
+    var imgUrl = image ? image.get('image').url() : '';
 
     return (
       <div
@@ -57,6 +57,7 @@ var StreetImageList = React.createClass({
     var query = new Parse.Query(StreetImage);
     query.descending("createdAt");
     query.equalTo('belongTo', session);
+    query.include('coverImage');
     query.find().then(function(streetImages) {
       this.setState({streetImages: streetImages});
     }.bind(this));
