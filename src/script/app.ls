@@ -14,8 +14,7 @@ Parse.initialize do
 
 require! './routes.jsx'
 
-Util.loadScript Config.CDN.CKEditor
-.then -> $ ->
+$ ->
   Router.run routes, (Handler) ->  
     React.render do
       React.createElement Handler
