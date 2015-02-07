@@ -1,4 +1,6 @@
+var path = require('path');
 var React = require('react');
+var moment = require('moment');
 var App = require('../app.ls');
 var {Parse} = require('parse');
 var Router = require('react-router');
@@ -66,11 +68,10 @@ var ArticleEditor = React.createClass({
         article.set(target.id, parseInt(target.value));
         break;
       case 'file':
-        if (target.files.length) {
-          var file = new Parse.File(
-            target.value.split('/')
-            .pop().split('\\').pop(),
-            target.files[0]);
+        var {files} = target;
+        if (files.length) {
+          var filename = moment().format('YYYY-MM-DD-hh-mm-ss') + path.extname(files[0].name);
+          var file = new Parse.File(filename, files[0]);
           file.save().then(function() {
             article.set(target.id, file);
             self.forceUpdate();
