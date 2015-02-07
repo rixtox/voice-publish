@@ -1,73 +1,101 @@
 var Q = require('q');
+var path = require('path');
 var React = require('react');
-var Parse = require('../app.ls').Parse;
-var Pure = require('../components/pure.jsx');
-var Form = require('../components/form.jsx');
+var moment = require('moment');
+var App = require('../app.ls');
+var {Parse} = require('parse');
+var Router = require('react-router');
+var Session = require('../model/session.ls');
 var StreetImage = require('../model/street-image.ls');
 var StreetDetailImage = require('../model/street-detail-image.ls');
 
+var {Config} = App;
+var {Link} = Router;
+
 var StreetImageEditor = React.createClass({
+  mixins: [Router.State, Router.Navigation],
 
   getInitialState: function() {
-    var streetImage = this.props.streetImage;
-    if (!streetImage) {
-      streetImage = new StreetImage;
-      streetImage.set('belongTo', this.props.session);
-    }
+    var session = new Session;
+    session.id = this.getParams().sessionId;
+    var streetImage = new StreetImage;
+    streetImage.set('belongTo', session);
     return {
       streetImage: streetImage,
-      streetDetailImages: []
+      streetDetailImages: [],
+      session: session,
+      message: ''
     };
   },
 
-  updateStreetDetailImages: function(nextStreetImage) {
-    var streetImage = nextStreetImage || this.state.streetImage;
-    if (!streetImage.isNew()) {
-      var query = new Parse.Query(StreetDetailImage);
-      query.ascending('indexNumber');
-      query.equalTo('belongTo', streetImage);
-      query.find().then(function(streetDetailImages) {
-        this.setState({streetDetailImages: streetDetailImages});
-      }.bind(this));
+  updatePhotos: function() {
+    var self = this;
+    var streetImage = new StreetImage;
+    streetImage.set('belongTo', self.state.session);
+    self.setState({streetImage: streetImage});
+    var {photoId} = self.getParams();
+    if (photoId) {
+      var query = new Parse.Query(StreetImage);
+      query.equalTo('objectId', photoId);
+      query.first({
+        success: function(streetImage) {
+          self.setState({streetImage: streetImage});
+        }
+      });
+      var streetImageTmp = new StreetImage;
+      streetImageTmp.id = photoId;
+      var query2 = new Parse.Query(StreetDetailImage);
+      query2.equalTo('belongTo', streetImageTmp);
+      query2.descending("indexNumber");
+      query2.find().then(function(streetDetailImages) {
+        self.setState({streetDetailImages: streetDetailImages});
+      });
     }
+  },
+
+  showMessage: function(message) {
+    this.setState({message: (new Date).toLocaleTimeString() + ': ' + message});
   },
 
   componentDidMount: function() {
-    this.updateStreetDetailImages();
+    this.updatePhotos();
   },
 
-  componentWillReceiveProps: function(nextProps) {
-    this.updateStreetDetailImages(nextProps.streetImage);
-  },
-
-  onNewImage: function() {
-    var streetDetailImages = this.state.streetDetailImages;
-    var streetDetailImage = new StreetDetailImage;
-    if (streetDetailImages.length > 0) {
-      streetDetailImage.set(
-        'indexNumber',
-        streetDetailImages[streetDetailImages.length - 1]
-        .get('indexNumber') + 1);
-    } else {
-      streetDetailImage.set('indexNumber', 1);
+  addNewPhotos: function(files) {
+    var self = this;
+    for (var i = 0, file; file = files[i]; i++) {
+      var filename = moment().format('YYYY-MM-DD-hh-mm-ss') + path.extname(file.name);
+      console.log(filename);
+      var parseFile = new Parse.File(filename, file);
+      parseFile.save().then(function() {
+        var streetDetailImage = new StreetDetailImage;
+        streetDetailImage.set('belongTo', self.state.streetImage);
+        streetDetailImage.set('image', this);
+        self.state.streetDetailImages.unshift(streetDetailImage);
+        self.forceUpdate();
+      }.bind(parseFile), function(error) {
+        self.showMessage('File cannot be uploaded!');
+      });
     }
-    streetDetailImages.push(streetDetailImage);
-    this.forceUpdate();
   },
 
-  onImageChanged: function(streetDetailImage) {
-    var self = this;
-    return function(event, element) {
-      var file = event.target;
-      if (file.files[0])
-        streetDetailImage.set('image', new Parse.File(
-          file.value.split('/').pop().split('\\').pop(), file.files[0]));
-    };
+  onFilesAdded: function(event) {
+    var {files} = event.target;
+    if (files.length)
+      this.addNewPhotos(files);
   },
 
-  onImageRemoved: function(streetDetailImage) {
+  onFilesDropped: function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    var {files} = event.dataTransfer;
+    if (files.length)
+      this.addNewPhotos(files);
+  },
+
+  onPhotoRemoved: function(streetDetailImage) {
     var self = this;
-    var streetDetailImages = self.state.streetDetailImages;
+    var {streetDetailImages} = self.state;
     return function() {
       var index = streetDetailImages.indexOf(streetDetailImage);
       if (streetDetailImage.isNew()) {
@@ -78,114 +106,191 @@ var StreetImageEditor = React.createClass({
           streetDetailImages.splice(index, 1);
           self.forceUpdate();
         }, function(error) {
-          alert('Image cannot be removed!');
+          self.showMessage('Image cannot be removed!');
         });
       }
     };
   },
 
+  onSetCover: function(streetDetailImage) {
+    var self = this;
+    var {streetImage} = self.state;
+
+    return function() {
+      streetImage.set('coverImage', streetDetailImage);
+      self.forceUpdate();
+    };
+  },
+
   onDelete: function() {
     var self = this;
-    var streetImage = this.state.streetImage;
+    var {streetImage} = this.state;
 
-    if (streetImage.isNew())
-      self.props.onDelete();
-    else
+    if (!streetImage.isNew())
       streetImage.destroy(function() {
-        self.props.onDelete();
+        self.backToList();
       }, function(error) {
-        alert('Street image cannot be deleted!');
+        self.showMessage('Street image cannot be deleted!');
       });
   },
 
-  onSubmit: function(event) {
+  backToList: function() {
+    this.transitionTo('/session/' + this.getParams().sessionId + '/photos');
+  },
+
+  preventDefault: function(event) {
     event.preventDefault();
   },
 
   onSave: function() {
     var self = this;
-    var streetImage = self.state.streetImage;
-    var file = this.refs.coverImage.refs.input.getDOMNode();
+    var {streetImage} = self.state;
 
-    streetImage.set('photoBy', this.refs.photoBy.state.value);
-    streetImage.set('who', this.refs.who.state.value);
-    if (file.files[0])
-      streetImage.set('image', new Parse.File(
-        file.value.split('/').pop().split('\\').pop(), file.files[0]));
     streetImage.save().then(function() {
-      Q.all(self.state.streetDetailImages.map(function(streetDetailImage) {
+      Q.all(([].concat(self.state.streetDetailImages)).reverse().map(function(streetDetailImage, index) {
         var deferred = Q.defer();
-        streetDetailImage.set('belongTo', streetImage);
-        streetDetailImage.save(null, {
-          success: function() {
-            deferred.resolve();
-          },
-          error: function(error) {
-            deferred.reject(new Error(error));
-          }
-        });
-        return deferred.promise;
+        streetDetailImage.set('indexNumber', index);
+        if (streetDetailImage.dirty()) {
+          streetDetailImage.save(null, {
+            success: function() {
+              deferred.resolve();
+            },
+            error: function(error) {
+              deferred.reject(new Error(error));
+            }
+          });
+          return deferred.promise;
+        }
       })).then(function() {
-        self.props.onSave(streetImage);
+        self.showMessage('Street image saved.');
         self.forceUpdate();
       }).catch(function() {
-        alert('Street image cannot be saved!');
+        self.showMessage('Street image cannot be saved!');
       });
     }, function(error) {
-      alert('Street image cannot be saved!');
+      self.showMessage('Street image cannot be saved!');
     });
+  },
+
+  onChange: function(event) {
+    var self = this;
+    var data = self.state.streetImage;
+    var {target} = event;
+    switch (target.type) {
+      case 'text':
+      case 'url':
+      case 'password':
+        data.set(target.id, target.value);
+        break;
+      case 'checkbox':
+        data.set(target.id, target.checked);
+        break;
+      case 'number':
+        data.set(target.id, parseInt(target.value));
+        break;
+      case 'file':
+        if (target.files.length) {
+          var file = new Parse.File(
+            target.value.split('/')
+            .pop().split('\\').pop(),
+            target.files[0]);
+          file.save().then(function() {
+            data.set(target.id, file);
+            self.forceUpdate();
+          }, function(error) {
+            self.showMessage('File cannot be uploaded!');
+          });
+        }
+    }
+    self.forceUpdate();
   },
 
   render: function() {
     var self = this;
-    var streetImage = this.state.streetImage;
-    var coverImage = streetImage.get('image');
+    var {streetImage, streetDetailImages} = self.state;
+    var coverImage = streetImage.get('coverImage') || {};
     return (
-      <Pure u="3-5">
-        <h2>Edit Street Images</h2>
-        <button onClick={this.onSave}>Save</button>
-        <button onClick={this.onDelete}>Delete</button>
-        <Form onSubmit={this.onSubmit}>
-          <Form.Input u
-            ref="who"
-            tag="who"
-            autoFocus
-            text="Character"
-            value={streetImage.get('who')} />
-          <Form.Input u
-            ref="photoBy"
-            tag="photoBy"
-            text="Photo by"
-            value={streetImage.get('photoBy')} />
-          <Form.Input u
-            ref="coverImage"
-            tag="coverImage"
-            type="file" >
-            <p>Cover Image</p>
-            <p>{'（推荐尺寸：800*1200 Pixels）'}</p>
-            <img src={coverImage ? coverImage.url() : null} />
-          </Form.Input>
-          {this.state.streetDetailImages.map(function(streetDetailImage) {
-            var image = streetDetailImage.get('image');
-            return (
-              <Form.Input u
+      <div key={streetImage.isNew() ? 'new-photo' : streetImage.id} className="dashboard">
+        <div className="menu">
+          <div className="inner">
+            <a
+              title="Back"
+              className="btn-back fa fa-arrow-circle-o-left"
+              href="javascript:"
+              onClick={self.backToList} />
+            <h1 className="title">Edit Photo</h1>
+            <a className="btn-add" href="javascript:" onClick={self.onSave}>
+              <i className="btn-icon fa fa-check"></i>
+              Save
+            </a>
+            <a className="btn-add" href="javascript:" onClick={self.onDelete}>
+              <i className="btn-icon fa fa-trash-o"></i>
+              Delete
+            </a>
+            <span className="message">{self.state.message}</span>
+          </div>
+        </div>
+        <div className="inner wrap">
+          <form onSubmit={self.preventDefault}>
+            <div className="input-group">
+              <label className="label" htmlFor="title">Character</label>
+              <input
+                id="who"
+                className="input"
+                autoFocus
+                onChange={self.onChange}
+                placeholder="Character"
+                value={streetImage.get('who')} />
+            </div>
+            <div className="input-group">
+              <label className="label" htmlFor="photoBy">Photo by</label>
+              <input
+                id="photoBy"
+                className="input"
+                onChange={self.onChange}
+                placeholder="Photo by"
+                value={streetImage.get('photoBy')} />
+            </div>
+          </form>
+          <section className="photos">
+            <div className="photo new-photo">
+              <label
+                htmlFor="new-photo"
+                onDragOver={self.preventDefault}
+                onDrop={self.onFilesDropped}>
+                <span>Drop photos here</span>
+              </label>
+              <input
                 type="file"
-                onChange={self.onImageChanged(streetDetailImage)}
-                key={streetDetailImage.id}>
-                <div>
-                  <button
-                    onClick={self.onImageRemoved(streetDetailImage)}>
-                    Remove Image
-                  </button>
+                id="new-photo"
+                multiple="true"
+                onChange={self.onFilesAdded}/>
+            </div>
+            {streetDetailImages.map(function(image) {
+              var coverClass = 'control-btn fa fa-bookmark';
+              if (image.id != coverImage.id)
+                coverClass += '-o';
+              return (
+                <div className="photo">
+                  <label style={{backgroundImage: 'url(' + image.get('image').url() + ')'}}/>
+                  <div className="controls">
+                    <a
+                      className="control-btn fa fa-trash-o"
+                      title="Delete"
+                      href="javascript:"
+                      onClick={self.onPhotoRemoved(image)}/>
+                    <a
+                      className={coverClass}
+                      title="Cover Image"
+                      href="javascript:"
+                      onClick={self.onSetCover(image)}/>
+                  </div>
                 </div>
-                <p>{'（推荐尺寸：800*1200 Pixels）'}</p>
-                <img src={image ? image.url() : null} />
-              </Form.Input>
-            );
-          })}
-          <button onClick={this.onNewImage}>Add</button>
-        </Form>
-      </Pure>
+              );
+            })}
+          </section>
+        </div>
+      </div>
     );
   }
 

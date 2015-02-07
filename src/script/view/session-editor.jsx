@@ -10,7 +10,8 @@ var SessionEditor = React.createClass({
 
   getInitialState: function() {
     return {
-      session: new Session
+      session: new Session,
+      message: ''
     };
   },
 
@@ -29,6 +30,10 @@ var SessionEditor = React.createClass({
     }
   },
 
+  showMessage: function(message) {
+    this.setState({message: (new Date).toLocaleTimeString() + ': ' + message});
+  },
+
   componentDidMount: function() {
     this.updateSession();
   },
@@ -42,8 +47,11 @@ var SessionEditor = React.createClass({
     var session = this.state.session;
 
     session.save({
+      success: function() {
+        self.showMessage('Session saved.');
+      },
       error: function(error) {
-        alert('Session cannot be saved!');
+        self.showMessage('Session cannot be saved!');
       }
     });
   },
@@ -56,7 +64,7 @@ var SessionEditor = React.createClass({
       session.destroy(function() {
         self.transitionTo('/');
       }, function(error) {
-        alert('Session cannot be deleted!');
+        self.showMessage('Session cannot be deleted!');
       });
   },
 
@@ -65,16 +73,36 @@ var SessionEditor = React.createClass({
   },
 
   onChange: function(event) {
-    var {session} = this.state;
+    var self = this;
+    var {session} = self.state;
     var {target} = event;
-    if (target.type == 'text') {
-      session.set(event.target.id, event.target.value);
-    } else if (target.type == 'checkbox') {
-      session.set(event.target.id, event.target.checked);
-    } else if (target.type == 'number') {
-      session.set(event.target.id, parseInt(event.target.value));
+    switch (target.type) {
+      case 'text':
+      case 'url':
+      case 'password':
+        session.set(target.id, target.value);
+        break;
+      case 'checkbox':
+        session.set(target.id, target.checked);
+        break;
+      case 'number':
+        session.set(target.id, parseInt(target.value));
+        break;
+      case 'file':
+        if (target.files.length) {
+          var file = new Parse.File(
+            target.value.split('/')
+            .pop().split('\\').pop(),
+            target.files[0]);
+          file.save().then(function() {
+            session.set(target.id, file);
+            self.forceUpdate();
+          }, function(error) {
+            self.showMessage('File cannot be uploaded!');
+          });
+        }
     }
-    this.forceUpdate();
+    self.forceUpdate();
   },
 
   render: function() {
@@ -97,10 +125,11 @@ var SessionEditor = React.createClass({
               <i className="btn-icon fa fa-trash-o"></i>
               Delete
             </a>
+            <span className="message">{this.state.message}</span>
           </div>
         </div>
         <div className="inner wrap">
-          <form onSubmit={this.onSubmit} onChange={this.onChange}>
+          <form onSubmit={this.onSubmit}>
             <div className="input-group">
               <label className="label" htmlFor="title">Title</label>
               <input
@@ -108,6 +137,7 @@ var SessionEditor = React.createClass({
                 className="input"
                 autoFocus
                 placeholder="Title"
+                onChange={this.onChange}
                 value={session.get('title')} />
             </div>
             <div className="input-group">
@@ -116,6 +146,7 @@ var SessionEditor = React.createClass({
                 id="who"
                 className="input"
                 placeholder="Character"
+                onChange={this.onChange}
                 value={session.get('who')} />
             </div>
             <div className="input-group">
@@ -124,6 +155,7 @@ var SessionEditor = React.createClass({
                 id="photoBy"
                 className="input"
                 placeholder="Photo by"
+                onChange={this.onChange}
                 value={session.get('photoBy')} />
             </div>
             <div className="input-group">
@@ -135,6 +167,7 @@ var SessionEditor = React.createClass({
                 min="1"
                 step="1"
                 placeholder="Index number"
+                onChange={this.onChange}
                 value={session.get('number')} />
             </div>
             <div className="input-group">
@@ -145,6 +178,7 @@ var SessionEditor = React.createClass({
                 <input
                   id="isPublished"
                   type="checkbox"
+                  onChange={this.onChange}
                   checked={session.get('isPublished')} />
                 Is published
               </label>

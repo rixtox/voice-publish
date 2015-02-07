@@ -11,8 +11,13 @@ var SessionDetails = React.createClass({
 
   getInitialState: function() {
     return {
-      session: null
+      session: null,
+      message: ''
     };
+  },
+
+  showMessage: function(message) {
+    this.setState({message: (new Date).toLocaleTimeString() + ': ' + message});
   },
 
   updateSession: function() {
@@ -53,9 +58,10 @@ var SessionDetails = React.createClass({
                 <i className="btn-icon fa fa-plus"></i>
                 New Photos
               </Link>
+              <span className="message">{this.state.message}</span>
             </div>
           </div>
-          <RouteHandler/>
+          <RouteHandler showMessage={this.showMessage}/>
         </div>
       );
     } else return null;

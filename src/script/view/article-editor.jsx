@@ -19,7 +19,8 @@ var ArticleEditor = React.createClass({
     article.set('belongTo', session);
     return {
       article: article,
-      session: session
+      session: session,
+      message: ''
     };
   },
 
@@ -42,6 +43,10 @@ var ArticleEditor = React.createClass({
 
   componentDidMount: function() {
     this.updateArticle();
+  },
+
+  showMessage: function(message) {
+    this.setState({message: (new Date).toLocaleTimeString() + ': ' + message});
   },
 
   onChange: function(event) {
@@ -70,7 +75,7 @@ var ArticleEditor = React.createClass({
             article.set(target.id, file);
             self.forceUpdate();
           }, function(error) {
-            alert('File cannot be uploaded!');
+            self.showMessage('File cannot be uploaded!');
           });
         }
     }
@@ -82,8 +87,11 @@ var ArticleEditor = React.createClass({
     var article = this.state.article;
 
     article.save({
+      success: function() {
+        self.showMessage('Article saved.');
+      },
       error: function(error) {
-        alert('Article cannot be saved!');
+        self.showMessage('Article cannot be saved!');
       }
     });
   },
@@ -96,7 +104,7 @@ var ArticleEditor = React.createClass({
       article.destroy(function() {
         self.transitionTo('/session/' + self.getParams().sessionId);
       }, function(error) {
-        alert('Article cannot be deleted!');
+        self.showMessage('Article cannot be deleted!');
       });
   },
 
@@ -132,6 +140,7 @@ var ArticleEditor = React.createClass({
               <i className="btn-icon fa fa-trash-o"></i>
               Delete
             </a>
+            <span className="message">{this.state.message}</span>
           </div>
         </div>
         <div className="inner wrap">

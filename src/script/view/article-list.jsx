@@ -11,6 +11,10 @@ var {Config} = App;
 var ArticleItem = React.createClass({
   mixins: [Router.State],
 
+  onDelete: function() {
+    this.props.onDelete(this.props.article);
+  },
+
   render: function() {
     var imgFile = this.props.article.get('briefImage');
     var imgUrl = imgFile ? imgFile.url() : '';
@@ -30,7 +34,8 @@ var ArticleItem = React.createClass({
           <a
             className="control-btn fa fa-trash-o"
             title="Delete"
-            href="javascript:"/>
+            href="javascript:"
+            onClick={this.onDelete}/>
           <a
             className="control-btn fa fa-eye"
             title="Preview"
@@ -71,9 +76,20 @@ var ArticleListView = React.createClass({
     this.updateArticles(nextProps.session);
   },
 
+  onDelete: function(article) {
+    var self = this;
+
+    article.destroy(function() {
+      self.updateArticles();
+    }, function(error) {
+      self.props.showMessage('Article cannot be deleted!');
+    });
+  },
+
   render: function() {
     var self = this;
     var sessionId = self.getParams().sessionId;
+    var {articles} = self.state;
     var linkClass = self.isActive('session-default') ? 'active' : '';
     return (
       <div className="inner wrap">
@@ -85,11 +101,12 @@ var ArticleListView = React.createClass({
             <h2 className="option">Photos</h2>
           </Link>
         </div>
-        {this.state.articles.map(function(article) {
+        {articles.map(function(article) {
           return (
             <ArticleItem
               key={article.id}
-              article={article} />
+              article={article}
+              onDelete={self.onDelete} />
           );
         })}
       </div>

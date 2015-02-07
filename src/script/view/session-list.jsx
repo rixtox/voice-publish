@@ -9,10 +9,15 @@ var {Parse, Mixin, Config} = App,
 
 var SessionItem = React.createClass({
 
+  onDelete: function() {
+    this.props.onDelete(this.props.session);
+  },
+
   render: function() {
     if (this.props.article)
       var imgFile = this.props.article.get('briefImage');
     var imgUrl = imgFile ? imgFile.url() : '';
+    var {session} = this.props;
 
     return (
       <div
@@ -21,19 +26,21 @@ var SessionItem = React.createClass({
         <Link
           className="link"
           title="Details"
-          to={'/session/' + this.props.session.id + '/'}/>
+          to={'/session/' + session.id + '/'}/>
         <div className="title">
-          {'Session ' + this.props.session.get('number')}
+          {'Session ' + session.get('number')}
+          {session.get('isPublished') ? '' : ' (draft)'}
         </div>
         <div className="controls">
           <a
             className="control-btn fa fa-trash-o"
             title="Delete"
-            href="javascript:"/>
+            href="javascript:"
+            onClick={this.onDelete}/>
           <Link
             className="control-btn fa fa-pencil"
             title="Edit"
-            to={'/edit/session/' + this.props.session.id}/>
+            to={'/edit/session/' + session.id}/>
         </div>
       </div>
     );
@@ -47,7 +54,8 @@ var SessionList = React.createClass({
   getInitialState: function() {
     return {
       sessions: [],
-      articles: {}
+      articles: {},
+      message: ''
     };
   },
 
@@ -72,6 +80,20 @@ var SessionList = React.createClass({
     });
   },
 
+  showMessage: function(message) {
+    this.setState({message: (new Date).toLocaleTimeString() + ': ' + message});
+  },
+
+  onDelete: function(session) {
+    var self = this;
+
+    session.destroy(function() {
+      self.updateSessions();
+    }, function(error) {
+      self.showMessage('Session cannot be deleted!');
+    });
+  },
+
   componentDidMount: function() {
     this.updateSessions();
   },
@@ -93,6 +115,7 @@ var SessionList = React.createClass({
               <i className="btn-icon fa fa-plus"></i>
               Add
             </Link>
+            <span className="message">{this.state.message}</span>
           </div>
         </div>
         <div className="inner wrap">
@@ -101,7 +124,8 @@ var SessionList = React.createClass({
               <SessionItem
                 key={session.id}
                 session={session}
-                article={articles[session.id]} />
+                article={articles[session.id]}
+                onDelete={self.onDelete}/>
             );
           })}
         </div>
