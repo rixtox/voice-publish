@@ -1,51 +1,100 @@
 var React = require('react');
-var Parse = require('../app.ls').Parse;
-var Pure = require('../components/pure.jsx');
-var Form = require('../components/form.jsx');
+var App = require('../app.ls');
+var {Parse} = require('parse');
+var Router = require('react-router');
 var Article = require('../model/article.ls');
+var Session = require('../model/session.ls');
+var CKEditor = require('../components/ckeditor.jsx');
+
+var {Config} = App;
+var {Link} = Router;
 
 var ArticleEditor = React.createClass({
+  mixins: [Router.State, Router.Navigation],
 
   getInitialState: function() {
-    if (this.props.article) {
-      var article = this.props.article;
-    } else {
-      var article = new Article;
-      article.set('belongTo', this.props.session);
-    };
+    var session = new Session;
+    session.id = this.getParams().sessionId;
+    var article = new Article;
+    article.set('belongTo', session);
     return {
-      article: article
+      article: article,
+      session: session
     };
+  },
+
+  updateArticle: function() {
+    var self = this;
+    var article = new Article;
+    article.set('belongTo', self.state.session);
+    self.setState({article: article});
+    var {articleId} = self.getParams();
+    if (articleId) {
+      var query = new Parse.Query(Article);
+      query.equalTo('objectId', articleId);
+      query.first({
+        success: function(article) {
+          self.setState({article: article});
+        }
+      });
+    }
+  },
+
+  componentDidMount: function() {
+    this.updateArticle();
+  },
+
+  onChange: function(event) {
+    var self = this;
+    var {article} = self.state;
+    var {target} = event;
+    switch (target.type) {
+      case 'text':
+      case 'url':
+      case 'password':
+        article.set(target.id, target.value);
+        break;
+      case 'checkbox':
+        article.set(target.id, target.checked);
+        break;
+      case 'number':
+        article.set(target.id, parseInt(target.value));
+        break;
+      case 'file':
+        if (target.files.length) {
+          var file = new Parse.File(
+            target.value.split('/')
+            .pop().split('\\').pop(),
+            target.files[0]);
+          file.save().then(function() {
+            article.set(target.id, file);
+            self.forceUpdate();
+          }, function(error) {
+            alert('File cannot be uploaded!');
+          });
+        }
+    }
+    self.forceUpdate();
   },
 
   onSave: function() {
     var self = this;
     var article = this.state.article;
-    var file = this.refs.briefImage.refs.input.getDOMNode();
 
-    article.set('title', this.refs.title.state.value);
-    article.set('writerName', this.refs.author.state.value);
-    article.set('url', this.refs.url.state.value);
-    if (file.files[0]) {
-      article.set('briefImage', new Parse.File(
-        file.value.split('/').pop().split('\\').pop(), file.files[0]));
-    }
-    article.save().then(function() {
-      self.props.onSave(article);
-    }, function(error) {
-      alert('Article cannot be saved!');
+    article.save({
+      error: function(error) {
+        alert('Article cannot be saved!');
+      }
     });
   },
 
   onDelete: function() {
     var self = this;
-    var article = this.state.article;
+    var {article} = this.state;
 
-    if (article.isNew())
-      self.props.onDelete();
-    else
+    if (!article.isNew())
       article.destroy(function() {
-        self.props.onDelete();
+        self.transitionTo('/session/' + self.getParams().sessionId);
       }, function(error) {
         alert('Article cannot be deleted!');
       });
@@ -58,38 +107,106 @@ var ArticleEditor = React.createClass({
   render: function() {
     var article = this.state.article;
     var briefImage = article.get('briefImage');
+    if (briefImage)
+      var coverImage = <img src={briefImage.url()} />;
+    else
+      var coverImage = <div className="empty-image"></div>
     return (
-      <Pure u="3-5">
-        <h2>Edit Article</h2>
-        <button onClick={this.onSave}>Save</button>
-        <button onClick={this.onDelete}>Delete</button>
-        <Form onSubmit={this.onSubmit}>
-          <Form.Input u
-            ref="title"
-            tag="title"
-            autoFocus
-            text="Title"
-            value={article.get('title')} />
-          <Form.Input u
-            ref="author"
-            tag="author"
-            text="Author"
-            value={article.get('writerName')} />
-          <Form.Input u
-            ref="url"
-            tag="url"
-            text="URL"
-            value={article.get('url')} />
-          <Form.Input u
-            ref="briefImage"
-            tag="briefImage"
-            type="file" >
-            <p>Cover Image</p>
-            <p>{'（推荐尺寸：640*250 Pixels）'}</p>
-            <img src={briefImage ? briefImage.url() : null} />
-          </Form.Input>
-        </Form>
-      </Pure>
+      <div key={article.isNew() ? 'new-article' : article.id} className="dashboard">
+        <div className="menu">
+          <div className="inner">
+            <Link
+              title="Back"
+              className="btn-back fa fa-arrow-circle-o-left"
+              to={'/session/' + this.getParams().sessionId}/>
+            <h1 className="title">Edit Article</h1>
+            <a className="btn-add" href="javascript:" onClick={this.onSave}>
+              <i className="btn-icon fa fa-check"></i>
+              Save
+            </a>
+            <a className="btn-add" target="_blank" href={Config.Url.Preview + 'article/' + article.id}>
+              <i className="btn-icon fa fa-external-link"></i>
+              External Link
+            </a>
+            <a className="btn-add" href="javascript:" onClick={this.onDelete}>
+              <i className="btn-icon fa fa-trash-o"></i>
+              Delete
+            </a>
+          </div>
+        </div>
+        <div className="inner wrap">
+          <div className="split">
+            <div className="left">
+              <div className="preview">
+                <h1>Preview</h1>
+                <div className="cover-image">
+                  <label htmlFor="briefImage">
+                    {coverImage}
+                  </label>
+                  <input
+                    type="file"
+                    id="briefImage"
+                    onChange={this.onChange}/>
+                </div>
+                <section className="title">
+                  <h1>{article.get('title')}</h1>
+                  <sub>
+                    {article.get('writerName') ?
+                      (article.createdAt ?
+                        (article.createdAt || new Date).toLocaleDateString()
+                        + ' ' : '')
+                      + 'by ' + article.get('writerName') : ''}
+                  </sub>
+                </section>
+                <section
+                  className="content"
+                  dangerouslySetInnerHTML={{__html: article.get('content')}}></section>
+              </div>
+            </div>
+            <div className="right">
+              <form onSubmit={this.onSubmit}>
+                <div className="input-group">
+                  <label className="label" htmlFor="title">Title</label>
+                  <input
+                    id="title"
+                    className="input"
+                    autoFocus
+                    placeholder="Title"
+                    onChange={this.onChange}
+                    value={article.get('title')} />
+                </div>
+                <div className="input-group">
+                  <label className="label" htmlFor="writerName">Author</label>
+                  <input
+                    id="writerName"
+                    className="input"
+                    placeholder="Author"
+                    onChange={this.onChange}
+                    value={article.get('writerName')} />
+                </div>
+                <div className="input-group">
+                  <label className="label" htmlFor="url">URL</label>
+                  <input
+                    id="url"
+                    type="url"
+                    className="input"
+                    placeholder="URL"
+                    spellCheck="false"
+                    onChange={this.onChange}
+                    value={article.get('url')} />
+                </div>
+                <div className="input-group">
+                  <label className="label" htmlFor="content">Content</label>
+                  <CKEditor
+                    id="content"
+                    value={article.get('content')}
+                    onChange={this.onChange}/>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 

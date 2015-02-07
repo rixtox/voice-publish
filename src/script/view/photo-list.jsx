@@ -8,6 +8,7 @@ var {Parse, Config} = App;
 var {RouteHandler, Link} = Router;
 
 var StreetImageItem = React.createClass({
+  mixins: [Router.State],
 
   render: function() {
     var imgFile = this.props.streetImage.get('image');
@@ -20,7 +21,7 @@ var StreetImageItem = React.createClass({
         <Link
           className="link"
           title="Edit"
-          to={'/edit/session/' + this.props.sessionId + '/photo/' + this.props.streetImage.id}/>
+          to={'/edit/session/' + this.getParams().sessionId + '/photo/' + this.props.streetImage.id}/>
         <div className="title">
           {this.props.streetImage.get('who')}
         </div>
@@ -86,7 +87,6 @@ var StreetImageList = React.createClass({
           return (
             <StreetImageItem
               key={streetImage.id}
-              sessionId={sessionId}
               streetImage={streetImage} />
           );
         })}

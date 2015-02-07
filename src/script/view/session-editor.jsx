@@ -1,41 +1,60 @@
 var React = require('react');
-var Pure = require('../components/pure.jsx');
-var Form = require('../components/form.jsx');
+var {Parse} = require('parse');
+var Router = require('react-router');
 var Session = require('../model/session.ls');
 
+var {Link} = Router;
+
 var SessionEditor = React.createClass({
+  mixins: [Router.State, Router.Navigation],
 
   getInitialState: function() {
     return {
-      session: this.props.session || new Session
+      session: new Session
     };
+  },
+
+  updateSession: function() {
+    var self = this;
+    self.setState({session: new Session});
+    var {sessionId} = self.getParams();
+    if (sessionId) {
+      var query = new Parse.Query(Session);
+      query.equalTo('objectId', sessionId);
+      query.first({
+        success: function(session) {
+          self.setState({session: session});
+        }
+      });
+    }
+  },
+
+  componentDidMount: function() {
+    this.updateSession();
+  },
+
+  componentWillReceiveProps: function() {
+    this.updateSession();
   },
 
   onSave: function() {
     var self = this;
     var session = this.state.session;
 
-    session.set('title', this.refs.title.state.value);
-    session.set('who', this.refs.who.state.value);
-    session.set('photoBy', this.refs.photoBy.state.value);
-    session.set('number', parseInt(this.refs.number.state.value));
-    session.set('isPublished', this.refs.isPublished.state.value);
-    session.save().then(function() {
-      self.props.onSave(session);
-    }, function(error) {
-      alert('Session cannot be saved!');
+    session.save({
+      error: function(error) {
+        alert('Session cannot be saved!');
+      }
     });
   },
 
   onDelete: function() {
     var self = this;
-    var session = this.state.session;
+    var {session} = this.state;
 
-    if (session.isNew())
-      self.props.onDelete();
-    else
+    if (!session.isNew())
       session.destroy(function() {
-        self.props.onDelete();
+        self.transitionTo('/');
       }, function(error) {
         alert('Session cannot be deleted!');
       });
@@ -45,43 +64,94 @@ var SessionEditor = React.createClass({
     event.preventDefault();
   },
 
+  onChange: function(event) {
+    var {session} = this.state;
+    var {target} = event;
+    if (target.type == 'text') {
+      session.set(event.target.id, event.target.value);
+    } else if (target.type == 'checkbox') {
+      session.set(event.target.id, event.target.checked);
+    } else if (target.type == 'number') {
+      session.set(event.target.id, parseInt(event.target.value));
+    }
+    this.forceUpdate();
+  },
+
   render: function() {
     var self = this;
-    var session = this.state.session;
+    var {session} = this.state;
     return (
-      <Pure u="3-5">
-        <h2>Edit Session</h2>
-        <button onClick={this.onSave}>Save</button>
-        <button onClick={this.onDelete}>Delete</button>
-        <Form onSubmit={this.onSubmit}>
-          <Form.Input u
-            tag="title"
-            ref="title"
-            autoFocus
-            text="Title"
-            value={session.get('title')} />
-          <Form.Input u
-            tag="who"
-            ref="who"
-            text="Character"
-          value={session.get('who')} />
-          <Form.Input u
-            tag="photoBy"
-            ref="photoBy"
-            text="Photo by"
-            value={session.get('photoBy')} />
-          <Form.Input u
-            tag="number"
-            ref="number"
-            text="Index number"
-            value={session.get('number')} />
-          <Form.Checkbox u
-            tag="isPublished"
-            ref="isPublished"
-            text="Is published"
-            value={session.get('isPublished')} />
-        </Form>
-      </Pure>
+      <div key={session.isNew() ? 'new-session' : session.id} className="dashboard">
+        <div className="menu">
+          <div className="inner">
+            <Link
+              title="Back"
+              className="btn-back fa fa-arrow-circle-o-left"
+              to="/sessions"/>
+            <h1 className="title">Edit Session</h1>
+            <a className="btn-add" href="javascript:" onClick={this.onSave}>
+              <i className="btn-icon fa fa-check"></i>
+              Save
+            </a>
+            <a className="btn-add" href="javascript:" onClick={this.onDelete}>
+              <i className="btn-icon fa fa-trash-o"></i>
+              Delete
+            </a>
+          </div>
+        </div>
+        <div className="inner wrap">
+          <form onSubmit={this.onSubmit} onChange={this.onChange}>
+            <div className="input-group">
+              <label className="label" htmlFor="title">Title</label>
+              <input
+                id="title"
+                className="input"
+                autoFocus
+                placeholder="Title"
+                value={session.get('title')} />
+            </div>
+            <div className="input-group">
+              <label className="label" htmlFor="who">Character</label>
+              <input
+                id="who"
+                className="input"
+                placeholder="Character"
+                value={session.get('who')} />
+            </div>
+            <div className="input-group">
+              <label className="label" htmlFor="photoBy">Photo by</label>
+              <input
+                id="photoBy"
+                className="input"
+                placeholder="Photo by"
+                value={session.get('photoBy')} />
+            </div>
+            <div className="input-group">
+              <label className="label" htmlFor="number">Index number</label>
+              <input
+                id="number"
+                className="input"
+                type="number"
+                min="1"
+                step="1"
+                placeholder="Index number"
+                value={session.get('number')} />
+            </div>
+            <div className="input-group">
+              <div className="label"></div>
+              <label
+                htmlFor="isPublished"
+                className="input">
+                <input
+                  id="isPublished"
+                  type="checkbox"
+                  checked={session.get('isPublished')} />
+                Is published
+              </label>
+            </div>
+          </form>
+        </div>
+      </div>
     );
   }
 

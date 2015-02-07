@@ -1,7 +1,6 @@
 var React = require('react');
 var App = require('../app.ls');
 var Router = require('react-router');
-var Pure = require('../components/pure.jsx');
 var Session = require('../model/session.ls');
 
 var {Parse} = App;
@@ -40,7 +39,7 @@ var SessionDetails = React.createClass({
       return (
         <div className="dashboard">
           <div className="menu">
-            <div className="wrap">
+            <div className="inner">
               <Link className="btn-back fa fa-arrow-circle-o-left" title="Back" to={'/sessions/'}/>
               <h1 className="title">
                 {'Session ' + session.get('number')}
@@ -63,5 +62,8 @@ var SessionDetails = React.createClass({
   }
 
 });
+
+SessionDetails.Articles = require('./article-list.jsx');
+SessionDetails.Photos = require('./photo-list.jsx');
 
 module.exports = SessionDetails;

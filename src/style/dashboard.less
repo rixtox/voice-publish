@@ -1,5 +1,6 @@
 .dashboard {
   width: @content-width;
+  position: relative;
   margin: 36px auto 88px;
   border: 1px solid #d9dadc;
   background-color: #fff;
@@ -7,11 +8,12 @@
 
   .menu {
     display: table;
+    width: 100%;
     border-bottom: 1px solid #d9dadc;
     border-collapse: separate;
     border-spacing: 20px 10px;
 
-    .wrap > * {
+    .inner > * {
       display: table-cell;
       vertical-align: middle;
     }
@@ -37,9 +39,162 @@
     }
   }
 
-  .inner {
+  & > .inner {
     padding-top: 30px;
     padding-bottom: 20px;
+
+    & > .split {
+      width: 100%;
+      position: relative;
+
+      & > * {
+        position: relative;
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      & > .left {
+        width: 30%;
+      }
+
+      & > .right {
+        width: 70%;
+      }
+    }
+
+    .preview {
+      & > h1 {
+        font-size: 1.8em;
+        margin-bottom: 10px;
+      }
+
+      .cover-image {
+        width: 100%;
+        position: relative;
+        box-shadow: 0 0 20px 2px rgba(0,0,0,0.2);
+
+        label {
+          width: 100%;
+          display: inline-block;
+          vertical-align: text-bottom;
+        }
+
+        .empty-image {
+          width: 100%;
+          cursor: pointer;
+          min-height: 300px;
+        }
+        
+        img {
+          width: 100%;
+          height: auto;
+          cursor: pointer;
+          vertical-align:text-bottom;
+        }
+
+        input[type="file"] {
+          display: none;
+        }
+      }
+
+      .title {
+        margin: 20px 0;
+
+        h1 {
+          font-size: 1.5em;
+          font-weight: 400;
+        }
+
+        sub {
+          font-size: 1em;
+          color: #777;
+        }
+      }
+
+      .content {
+        font-size: 1em;
+        line-height: 1.8em;
+        color: #3A4145;
+
+        p {
+          text-indent: 2em;
+          margin: 1em 0;
+        }
+      }
+    }
+
+    form {
+      padding: 20px 45px;
+      position: relative;
+      display: table;
+      width: 100%;
+
+      .input-group {
+        display: table-row;
+
+        & > * {
+          display: table-cell;
+          font-size: 1.2em;
+          line-height: 2em;
+        }
+
+        .label {
+          width: 15%;
+          color: #777;
+          text-align: right;
+          vertical-align: top;
+        }
+
+        .input {
+          width: 100%;
+          padding-left: 30px;
+        }
+
+        input[type="checkbox"] {
+          margin-right: 10px;
+        }
+
+        & > .ckeditor {
+          padding: 10px 30px;
+        }
+
+        .input.file {
+          label {
+            display: inline-block;
+          }
+
+          .preview-image {
+            cursor: pointer;
+            margin-top: 10px;
+            height: 500px;
+            width: 300px;
+            box-shadow: 0 0 20px 2px rgba(0,0,0,0.2);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            display: table;
+
+            i {
+              vertical-align: middle;
+              display: table-cell;
+              text-align: center;
+              color: @theme-color;
+              font-size: 2em;
+              opacity: 0;
+              transition: opacity .2s ease;
+            }
+
+            &:hover i {
+              opacity: 1;
+            }
+          }
+
+          input[type="file"] {
+            visibility: hidden;
+          }
+        }
+      }
+    }
 
     .selection {
       padding: 0 50px;
@@ -68,6 +223,7 @@
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center center;
+      box-shadow: 0 0 20px 2px rgba(0,0,0,0.2);
 
       .link {
         width: 100%;

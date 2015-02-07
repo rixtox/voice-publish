@@ -1,7 +1,6 @@
 var React = require('react');
 var App = require('../app.ls');
 var Router = require('react-router');
-var Pure = require('../components/pure.jsx');
 var Session = require('../model/session.ls');
 var Article = require('../model/article.ls');
 
@@ -88,7 +87,7 @@ var SessionList = React.createClass({
     return (
       <div className="dashboard">
         <div className="menu">
-          <div className="wrap">
+          <div className="inner">
             <h1 className="title">Sessions</h1>
             <Link className="btn-add" to="/edit/session/">
               <i className="btn-icon fa fa-plus"></i>

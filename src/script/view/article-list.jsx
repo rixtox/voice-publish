@@ -9,6 +9,7 @@ var {RouteHandler, Link} = Router;
 var {Config} = App;
 
 var ArticleItem = React.createClass({
+  mixins: [Router.State],
 
   render: function() {
     var imgFile = this.props.article.get('briefImage');
@@ -21,7 +22,7 @@ var ArticleItem = React.createClass({
         <Link
           className="link"
           title="Edit"
-          to={'/edit/session/' + this.props.sessionId + '/article/' + this.props.article.id}/>
+          to={'/edit/session/' + this.getParams().sessionId + '/article/' + this.props.article.id}/>
         <div className="title">
           {this.props.article.get('title')}
         </div>
@@ -88,7 +89,6 @@ var ArticleListView = React.createClass({
           return (
             <ArticleItem
               key={article.id}
-              sessionId={sessionId}
               article={article} />
           );
         })}

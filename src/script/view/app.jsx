@@ -1,7 +1,6 @@
 var React = require('react');
 var App = require('../app.ls');
 var Router = require('react-router');
-var Pure = require('../components/pure.jsx');
 
 var {Link, RouteHandler} = Router;
 
