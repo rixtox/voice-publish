@@ -1,6 +1,5 @@
 var path = require('path');
 var React = require('react');
-var moment = require('moment');
 var App = require('../app.ls');
 var {Parse} = require('parse');
 var Router = require('react-router');
@@ -70,7 +69,7 @@ var ArticleEditor = React.createClass({
       case 'file':
         var {files} = target;
         if (files.length) {
-          var filename = moment().format('YYYY-MM-DD-hh-mm-ss') + path.extname(files[0].name);
+          var filename = (new Date).toJSON().replace(/\..*$/, '').replace(/[T:]/g, '-') + path.extname(files[0].name);
           var file = new Parse.File(filename, files[0]);
           file.save().then(function() {
             article.set(target.id, file);

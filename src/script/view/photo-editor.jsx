@@ -1,7 +1,6 @@
 var Q = require('q');
 var path = require('path');
 var React = require('react');
-var moment = require('moment');
 var App = require('../app.ls');
 var {Parse} = require('parse');
 var Router = require('react-router');
@@ -64,7 +63,7 @@ var StreetImageEditor = React.createClass({
   addNewPhotos: function(files) {
     var self = this;
     for (var i = 0, file; file = files[i]; i++) {
-      var filename = moment().format('YYYY-MM-DD-hh-mm-ss') + path.extname(file.name);
+      var filename = (new Date).toJSON().replace(/\..*$/, '').replace(/[T:]/g, '-') + path.extname(file.name);
       console.log(filename);
       var parseFile = new Parse.File(filename, file);
       parseFile.save().then(function() {
@@ -118,6 +117,7 @@ var StreetImageEditor = React.createClass({
 
     return function() {
       streetImage.set('coverImage', streetDetailImage);
+      streetImage.set('image', streetDetailImage.get('image'));
       self.forceUpdate();
     };
   },

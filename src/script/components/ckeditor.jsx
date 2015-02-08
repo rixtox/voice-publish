@@ -1,7 +1,10 @@
+var Q = require('q');
+var path = require('path');
 var React = require('react');
-var {Util, Config} = require('../app.ls');
+var {Util, Config, Parse, Mixin} = require('../app.ls');
 
 var CKEditor = React.createClass({
+  mixins: [Mixin.Upload],
 
   getInitialState: function() {
     return {
@@ -9,18 +12,68 @@ var CKEditor = React.createClass({
     };
   },
 
+  loadCKEditor: function() {
+    if (typeof CKEDITOR == 'undefined')
+      return Util.loadScript(Config.CDN.CKEditor)
+            .then(this.loadParseImagePlugin);
+    else
+      return Q();
+  },
+
+  loadParseImagePlugin: function() {
+    var self = this;
+    var fileInput = self.refs.file;
+
+    CKEDITOR.plugins.add('parse-image', {
+      init: function(editor) {
+        editor.addCommand('parse-image', {
+          allowedContent: {
+            img: {
+              attributes: '!src,alt,width,height'
+            }
+          },
+          requiredContent: 'img',
+          exec: function() {
+          var {fileInput} = editor.config;
+          fileInput.onchange = function() {
+            self.uploadImages(this.files).then(function(images) {
+              images.map(function(image) {
+                var imageDOM = editor.document.createElement('img');
+                imageDOM.setAttribute('src', image.url());
+                editor.insertElement(imageDOM);
+              });
+            }).catch(function(error) {
+              console.error('Upload failed:', error);
+              alert('Upload failed: ' + error.message);
+            });
+          };
+          fileInput.click();
+        }});
+        editor.ui.addButton( 'ParseImage', {
+          label: 'Image',
+          command: 'parse-image',
+          toolbar: 'insert,0',
+          icon: './plugins/image2/icons/image.png'
+        });
+      }
+    });
+  },
+
   componentDidMount: function() {
     var self = this;
-    Util.loadScript(Config.CDN.CKEditor).then(function() {
+
+    self.loadCKEditor().then(function() {
       var textarea = self.refs.textarea.getDOMNode();
+      var fileInput = self.refs.fileInput.getDOMNode();
       var editor = CKEDITOR.replace(textarea, {
-        extraPlugins: 'autogrow,justify,find,basicstyles,font,colorbutton',
+        extraPlugins: 'autogrow,justify,find,basicstyles,font,colorbutton,parse-image',
         autoGrow_onStartup: true,
         autoGrow_minHeight: 500,
+        fileInput: fileInput,
         toolbar: [
           { name: 'editing', groups: [ 'find', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'Scayt' ] },
           { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Strike', '-', 'RemoveFormat' ] },
-          { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
+          { name: 'insert', items: [ 'ParseImage', 'Table', 'HorizontalRule', 'SpecialChar' ] },
           { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
           { name: 'document', items: [ 'Source' ] },
           '/',
@@ -58,6 +111,7 @@ var CKEditor = React.createClass({
     return (
       <div className="ckeditor">
         <textarea ref="textarea" style={{display: 'none'}}></textarea>
+        <input type="file" multiple="true" ref="fileInput" style={{display: 'none'}}></input>
       </div>
     );
   }
