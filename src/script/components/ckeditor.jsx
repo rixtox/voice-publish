@@ -70,7 +70,7 @@ var CKEditor = React.createClass({
       var textarea = self.refs.textarea.getDOMNode();
       var fileInput = self.refs.fileInput.getDOMNode();
       var editor = CKEDITOR.replace(textarea, {
-        extraPlugins: 'autogrow,justify,find,basicstyles,font,colorbutton,parse-image',
+        extraPlugins: 'autogrow,justify,find,basicstyles,font,colorbutton,indentblock,parse-image',
         autoGrow_onStartup: true,
         autoGrow_minHeight: 500,
         fileInput: fileInput,
