@@ -26,11 +26,13 @@ var CKEditor = React.createClass({
 
     CKEDITOR.plugins.add('parse-image', {
       init: function(editor) {
+        CKEDITOR.addCss( '.cke_editable img,.cke_editable figure { width: 100%; margin: 0; padding: 0; display: block; vertical-align:text-bottom; border: none; }' );
         editor.addCommand('parse-image', {
           allowedContent: {
             img: {
               attributes: '!src,alt,width,height'
-            }
+            },
+            figure: {}
           },
           requiredContent: 'img',
           exec: function() {
@@ -38,9 +40,11 @@ var CKEditor = React.createClass({
           fileInput.onchange = function() {
             self.uploadImages(this.files).then(function(images) {
               images.map(function(image) {
+                var figureDOM = editor.document.createElement('figure');
                 var imageDOM = editor.document.createElement('img');
                 imageDOM.setAttribute('src', image.url());
-                editor.insertElement(imageDOM);
+                figureDOM.append(imageDOM);
+                editor.insertElement(figureDOM);
               });
             }).catch(function(error) {
               console.error('Upload failed:', error);
