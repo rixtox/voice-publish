@@ -4,7 +4,7 @@ React = require 'react'
 App.Parse = Parse
 Router = require 'react-router'
 App.Config = Config = require '../../config.ls'
-App.Util = Util = require './util.ls'
+App.Util = Util = require './util/index.ls'
 App.Mixin = require './mixin/index.ls'
 
 Parse.initialize do

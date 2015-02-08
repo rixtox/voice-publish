@@ -21,4 +21,7 @@ Util =
     script |> document.getElementsByTagName("head")[0].appendChild
     deferred.promise
 
+  formatDate: require './format-date.js'
+    
+
 module.exports = Util

@@ -7,7 +7,7 @@ var Article = require('../model/article.ls');
 var Session = require('../model/session.ls');
 var CKEditor = require('../components/ckeditor.jsx');
 
-var {Config} = App;
+var {Config, Util} = App;
 var {Link} = Router;
 
 var ArticleEditor = React.createClass({
@@ -162,7 +162,7 @@ var ArticleEditor = React.createClass({
                   <sub>
                     {article.get('writerName') ?
                       (article.createdAt ?
-                        (article.createdAt || new Date).toLocaleDateString()
+                        Util.formatDate(article.createdAt || new Date, 'yyyy-mm-dd')
                         + ' ' : '')
                       + 'by ' + article.get('writerName') : ''}
                   </sub>
