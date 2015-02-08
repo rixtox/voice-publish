@@ -194,17 +194,6 @@ var ArticleEditor = React.createClass({
                     value={article.get('writerName')} />
                 </div>
                 <div className="input-group">
-                  <label className="label" htmlFor="url">URL</label>
-                  <input
-                    id="url"
-                    type="url"
-                    className="input"
-                    placeholder="URL"
-                    spellCheck="false"
-                    onChange={this.onChange}
-                    value={article.get('url')} />
-                </div>
-                <div className="input-group">
                   <label className="label" htmlFor="content">Content</label>
                   <CKEditor
                     id="content"

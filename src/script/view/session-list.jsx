@@ -2,7 +2,6 @@ var React = require('react');
 var App = require('../app.ls');
 var Router = require('react-router');
 var Session = require('../model/session.ls');
-var Article = require('../model/article.ls');
 
 var {Parse, Mixin, Config} = App,
     {Link, RouteHandler} = Router;
@@ -14,10 +13,9 @@ var SessionItem = React.createClass({
   },
 
   render: function() {
-    if (this.props.article)
-      var imgFile = this.props.article.get('briefImage');
-    var imgUrl = imgFile ? imgFile.url() : '';
     var {session} = this.props;
+    var imgFile = session.get('image');
+    var imgUrl = imgFile ? imgFile.url() : '';
 
     return (
       <div
@@ -54,7 +52,6 @@ var SessionList = React.createClass({
   getInitialState: function() {
     return {
       sessions: [],
-      articles: {},
       message: ''
     };
   },
@@ -64,18 +61,6 @@ var SessionList = React.createClass({
     var query = new Parse.Query(Session);
     query.descending('number');
     query.find().then(function(sessions) {
-      sessions.map(function(session) {
-        var query = new Parse.Query(Article);
-        query.equalTo('belongTo', session);
-        query.descending("createdAt");
-        query.first({
-          success: function(article) {
-            var articles = self.state.articles;
-            articles[session.id] = article;
-            self.setState({articles: articles});
-          }
-        });
-      });
       self.setState({sessions: sessions});
     });
   },
@@ -105,7 +90,6 @@ var SessionList = React.createClass({
   render: function() {
     var self = this;
     var sessions = this.state.sessions;
-    var articles = this.state.articles;
     return (
       <div className="dashboard">
         <div className="menu">
@@ -124,7 +108,6 @@ var SessionList = React.createClass({
               <SessionItem
                 key={session.id}
                 session={session}
-                article={articles[session.id]}
                 onDelete={self.onDelete}/>
             );
           })}

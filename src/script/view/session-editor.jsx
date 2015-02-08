@@ -108,6 +108,11 @@ var SessionEditor = React.createClass({
   render: function() {
     var self = this;
     var {session} = this.state;
+    var coverImage = session.get('image');
+    if (coverImage)
+      coverImage = <img src={coverImage.url()} />;
+    else
+      coverImage = <div className="empty-image"></div>
     return (
       <div key={session.isNew() ? 'new-session' : session.id} className="dashboard">
         <div className="menu">
@@ -129,61 +134,79 @@ var SessionEditor = React.createClass({
           </div>
         </div>
         <div className="inner wrap">
-          <form onSubmit={this.onSubmit}>
-            <div className="input-group">
-              <label className="label" htmlFor="title">Title</label>
-              <input
-                id="title"
-                className="input"
-                autoFocus
-                placeholder="Title"
-                onChange={this.onChange}
-                value={session.get('title')} />
+          <div className="split">
+            <div className="left">
+              <div className="preview">
+                <h1>Cover Image</h1>
+                <div className="cover-image">
+                  <label htmlFor="image">
+                    {coverImage}
+                  </label>
+                  <input
+                    type="file"
+                    id="image"
+                    onChange={this.onChange}/>
+                </div>
+              </div>
             </div>
-            <div className="input-group">
-              <label className="label" htmlFor="who">Character</label>
-              <input
-                id="who"
-                className="input"
-                placeholder="Character"
-                onChange={this.onChange}
-                value={session.get('who')} />
+            <div className="right">
+              <form onSubmit={this.onSubmit}>
+                <div className="input-group">
+                  <label className="label" htmlFor="title">Title</label>
+                  <input
+                    id="title"
+                    className="input"
+                    autoFocus
+                    placeholder="Title"
+                    onChange={this.onChange}
+                    value={session.get('title')} />
+                </div>
+                <div className="input-group">
+                  <label className="label" htmlFor="who">Character</label>
+                  <input
+                    id="who"
+                    className="input"
+                    placeholder="Character"
+                    onChange={this.onChange}
+                    value={session.get('who')} />
+                </div>
+                <div className="input-group">
+                  <label className="label" htmlFor="photoBy">Photo by</label>
+                  <input
+                    id="photoBy"
+                    className="input"
+                    placeholder="Photo by"
+                    onChange={this.onChange}
+                    value={session.get('photoBy')} />
+                </div>
+                <div className="input-group">
+                  <label className="label" htmlFor="number">Index</label>
+                  <input
+                    id="number"
+                    className="input"
+                    type="number"
+                    min="1"
+                    step="1"
+                    placeholder="Index number"
+                    onChange={this.onChange}
+                    value={session.get('number')} />
+                </div>
+                <div className="input-group">
+                  <div className="label"></div>
+                  <label
+                    htmlFor="isPublished"
+                    className="input">
+                    <input
+                      id="isPublished"
+                      type="checkbox"
+                      onChange={this.onChange}
+                      checked={session.get('isPublished')} />
+                    Is published
+                  </label>
+                </div>
+              </form>
             </div>
-            <div className="input-group">
-              <label className="label" htmlFor="photoBy">Photo by</label>
-              <input
-                id="photoBy"
-                className="input"
-                placeholder="Photo by"
-                onChange={this.onChange}
-                value={session.get('photoBy')} />
-            </div>
-            <div className="input-group">
-              <label className="label" htmlFor="number">Index number</label>
-              <input
-                id="number"
-                className="input"
-                type="number"
-                min="1"
-                step="1"
-                placeholder="Index number"
-                onChange={this.onChange}
-                value={session.get('number')} />
-            </div>
-            <div className="input-group">
-              <div className="label"></div>
-              <label
-                htmlFor="isPublished"
-                className="input">
-                <input
-                  id="isPublished"
-                  type="checkbox"
-                  onChange={this.onChange}
-                  checked={session.get('isPublished')} />
-                Is published
-              </label>
-            </div>
-          </form>
+          </div>
         </div>
       </div>
     );
