@@ -1,10 +1,10 @@
 var React = require('react');
 var App = require('../app.ls');
+var {Parse} = require('parse');
 var Router = require('react-router');
-var Session = require('../model/session.ls');
-var StreetImage = require('../model/street-image.ls');
+var {Session, StreetImage} = require('../models.ls');
 
-var {Parse, Config} = App;
+var {Config} = App;
 var {RouteHandler, Link} = Router;
 
 var StreetImageItem = React.createClass({

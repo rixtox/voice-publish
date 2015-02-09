@@ -4,9 +4,7 @@ var React = require('react');
 var App = require('../app.ls');
 var {Parse} = require('parse');
 var Router = require('react-router');
-var Session = require('../model/session.ls');
-var StreetImage = require('../model/street-image.ls');
-var StreetDetailImage = require('../model/street-detail-image.ls');
+var {Session, StreetImage, StreetDetailImage} = require('../models.ls');
 
 var {Config} = App;
 var {Link} = Router;

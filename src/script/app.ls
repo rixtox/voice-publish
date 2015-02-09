@@ -1,20 +1,23 @@
-module.exports = App = {}
-React = require 'react'
+React   = require 'react'
 {Parse} = require 'parse'
-App.Parse = Parse
-Router = require 'react-router'
-App.Config = Config = require '../../config.ls'
-App.Util = Util = require './util/index.ls'
-App.Mixin = require './mixin/index.ls'
+Router  = require 'react-router'
+
+module.exports = App =
+  Config: require '../../config.ls'
+  Mixin : require './mixin/index.ls'
+  Util  : require './util/index.ls'
+
+document.title = App.Config.Name
 
 Parse.initialize do
-  Config.Parse['Application ID']
-  Config.Parse['JavaScript Key']
-
-require! './routes.jsx'
+  App.Config.Parse['Application ID']
+  App.Config.Parse['JavaScript Key']
 
 window.onload = ->
-  Router.run routes, (Handler) ->  
+  App.Util.loadScript App.Config.CDN.CKEditor
+  .then ->
+    require! './routes.jsx'
+    Handler <- Router.run routes, _
     React.render do
       React.createElement Handler
       document.body

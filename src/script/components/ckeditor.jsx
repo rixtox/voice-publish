@@ -12,17 +12,12 @@ var CKEditor = React.createClass({
     };
   },
 
-  loadCKEditor: function() {
-    if (typeof CKEDITOR == 'undefined')
-      return Util.loadScript(Config.CDN.CKEditor)
-            .then(this.loadParseImagePlugin);
-    else
-      return Q();
-  },
-
   loadParseImagePlugin: function() {
     var self = this;
     var fileInput = self.refs.file;
+
+    if (CKEDITOR.plugins.get('parse-image'))
+      return;
 
     CKEDITOR.plugins.add('parse-image', {
       init: function(editor) {
@@ -66,37 +61,37 @@ var CKEditor = React.createClass({
   componentDidMount: function() {
     var self = this;
 
-    self.loadCKEditor().then(function() {
-      var textarea = self.refs.textarea.getDOMNode();
-      var fileInput = self.refs.fileInput.getDOMNode();
-      var editor = CKEDITOR.replace(textarea, {
-        extraPlugins: 'autogrow,justify,find,basicstyles,font,colorbutton,indentblock,parse-image',
-        autoGrow_onStartup: true,
-        autoGrow_minHeight: 500,
-        fileInput: fileInput,
-        toolbar: [
-          { name: 'editing', groups: [ 'find', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'Scayt' ] },
-          { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Strike', '-', 'RemoveFormat' ] },
-          { name: 'insert', items: [ 'ParseImage', 'Table', 'HorizontalRule', 'SpecialChar' ] },
-          { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
-          { name: 'document', items: [ 'Source' ] },
-          '/',
-          { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
-          { name: 'styles', items: [ 'TextColor', 'BGColor', 'Format', 'FontSize' ] }
-        ]
-      });
-      editor.setData(self.props.value);
-      editor.on('change', function(e) {
-        self.props.onChange({
-          target: {
-            type: 'text',
-            id: self.props.id,
-            value: editor.getData()
-          }
-        });
-      });
-      self.setState({editor: editor});
+    self.loadParseImagePlugin();
+    var textarea = self.refs.textarea.getDOMNode();
+    var fileInput = self.refs.fileInput.getDOMNode();
+    var editor = CKEDITOR.replace(textarea, {
+      extraPlugins: 'autogrow,justify,find,basicstyles,font,colorbutton,indentblock,parse-image',
+      autoGrow_onStartup: true,
+      autoGrow_minHeight: 500,
+      fileInput: fileInput,
+      toolbar: [
+        { name: 'editing', groups: [ 'find', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'Scayt' ] },
+        { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Strike', '-', 'RemoveFormat' ] },
+        { name: 'insert', items: [ 'ParseImage', 'Table', 'HorizontalRule', 'SpecialChar' ] },
+        { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+        { name: 'document', items: [ 'Source' ] },
+        '/',
+        { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
+        { name: 'styles', items: [ 'TextColor', 'BGColor', 'Format', 'FontSize' ] }
+      ]
     });
+    editor.setData(self.props.value);
+    editor.on('change', function(e) {
+      self.props.onChange({
+        target: {
+          type: 'text',
+          id: self.props.id,
+          value: editor.getData()
+        }
+      });
+    });
+    self.setState({editor: editor});
+
   },
 
   shouldComponentUpdate: function() {

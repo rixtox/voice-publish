@@ -1,5 +1,5 @@
 var React = require('react');
-var App = require('../app.ls');
+var {Mixin} = require('../app.ls');
 var Router = require('react-router');
 
 var {Link, RouteHandler} = Router;
@@ -7,7 +7,7 @@ var {Link, RouteHandler} = Router;
 var AppView = React.createClass({
 
   render: function() {
-    var navAccount = App.Mixin.Auth.getUser()
+    var navAccount = Mixin.Auth.getUser()
     ? (
       <li>
         <Link to="/logout">Logout</Link>

@@ -1,4 +1,5 @@
 module.exports =
+  Name: 'VOICE Publish'
   Parse:
     'Application ID': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     'JavaScript Key': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'

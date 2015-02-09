@@ -1,6 +1,8 @@
 require! 'url'
 Q = require 'q'
 
+loadedScripts = []
+
 Util =
   transformUrl: (uri) ->
     uri = url.parse uri
@@ -9,6 +11,9 @@ Util =
     url.format uri
 
   loadScript: (src) ->
+    if src in loadedScripts
+      return Q!
+    loadedScripts.push src
     deferred = Q.defer!
     src = Util.transformUrl src
     script = document.createElement 'script'

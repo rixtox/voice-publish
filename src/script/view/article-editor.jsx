@@ -3,90 +3,55 @@ var React = require('react');
 var App = require('../app.ls');
 var {Parse} = require('parse');
 var Router = require('react-router');
-var Article = require('../model/article.ls');
-var Session = require('../model/session.ls');
+var {Session} = require('../models.ls');
+var Form = require('../components/form.ls');
+var DataModel = require('../models.ls').Article;
 var CKEditor = require('../components/ckeditor.jsx');
 
-var {Config, Util} = App;
+var {Config, Util, Mixin} = App;
 var {Link} = Router;
 
 var ArticleEditor = React.createClass({
-  mixins: [Router.State, Router.Navigation],
+  mixins: [Router.State, Router.Navigation, Mixin.Events, Mixin.Upload],
 
   getInitialState: function() {
     var session = new Session;
     session.id = this.getParams().sessionId;
-    var article = new Article;
-    article.set('belongTo', session);
+    var data = new DataModel;
+    data.set('belongTo', session);
     return {
-      article: article,
+      data: data,
       session: session,
       message: ''
     };
   },
 
-  updateArticle: function() {
+  updateData: function() {
     var self = this;
-    var article = new Article;
-    article.set('belongTo', self.state.session);
-    self.setState({article: article});
-    var {articleId} = self.getParams();
-    if (articleId) {
-      var query = new Parse.Query(Article);
-      query.equalTo('objectId', articleId);
+    var data = new DataModel;
+    data.set('belongTo', self.state.session);
+    self.setState({data: data});
+    var {dataId} = self.getParams();
+    if (dataId) {
+      var query = new Parse.Query(DataModel);
+      query.equalTo('objectId', dataId);
       query.first({
-        success: function(article) {
-          self.setState({article: article});
+        success: function(data) {
+          self.setState({data: data});
         }
       });
     }
   },
 
   componentDidMount: function() {
-    this.updateArticle();
-  },
-
-  showMessage: function(message) {
-    this.setState({message: (new Date).toLocaleTimeString() + ': ' + message});
-  },
-
-  onChange: function(event) {
-    var self = this;
-    var {article} = self.state;
-    var {target} = event;
-    switch (target.type) {
-      case 'text':
-      case 'url':
-      case 'password':
-        article.set(target.id, target.value);
-        break;
-      case 'checkbox':
-        article.set(target.id, target.checked);
-        break;
-      case 'number':
-        article.set(target.id, parseInt(target.value));
-        break;
-      case 'file':
-        var {files} = target;
-        if (files.length) {
-          var filename = (new Date).toJSON().replace(/\..*$/, '').replace(/[T:]/g, '-') + path.extname(files[0].name);
-          var file = new Parse.File(filename, files[0]);
-          file.save().then(function() {
-            article.set(target.id, file);
-            self.forceUpdate();
-          }, function(error) {
-            self.showMessage('File cannot be uploaded!');
-          });
-        }
-    }
-    self.forceUpdate();
+    this.updateData();
   },
 
   onSave: function() {
     var self = this;
-    var article = this.state.article;
+    var {data} = this.state;
 
-    article.save({
+    data.save({
       success: function() {
         self.showMessage('Article saved.');
       },
@@ -98,49 +63,51 @@ var ArticleEditor = React.createClass({
 
   onDelete: function() {
     var self = this;
-    var {article} = this.state;
+    var {data} = this.state;
 
-    if (!article.isNew())
-      article.destroy(function() {
+    if (!data.isNew())
+      data.destroy(function() {
         self.transitionTo('/session/' + self.getParams().sessionId);
       }, function(error) {
         self.showMessage('Article cannot be deleted!');
       });
   },
 
-  onSubmit: function(event) {
-    event.preventDefault();
+  onChange: function() {
+    this.forceUpdate();
   },
 
   render: function() {
-    var article = this.state.article;
-    var briefImage = article.get('briefImage');
+    var self = this;
+    var {data} = self.state;
+    var briefImage = data.get('briefImage');
     if (briefImage)
       var coverImage = <img src={briefImage.url()} />;
     else
       var coverImage = <div className="empty-image"></div>
+    var onFormChange = self.onFormChange('data');
     return (
-      <div key={article.isNew() ? 'new-article' : article.id} className="dashboard">
+      <div key={data.isNew() ? 'new-article' : data.id} className="dashboard">
         <div className="menu">
           <div className="inner">
             <Link
               title="Back"
               className="btn-back fa fa-arrow-circle-o-left"
-              to={'/session/' + this.getParams().sessionId}/>
+              to={'/session/' + self.getParams().sessionId}/>
             <h1 className="title">Edit Article</h1>
-            <a className="btn-add" href="javascript:" onClick={this.onSave}>
+            <a className="btn-add" href="javascript:" onClick={self.onSave}>
               <i className="btn-icon fa fa-check"></i>
               Save
             </a>
-            <a className="btn-add" target="_blank" href={Config.Url.Preview + 'article/' + article.id}>
+            <a className="btn-add" target="_blank" href={Config.Url.Preview + 'article/' + data.id}>
               <i className="btn-icon fa fa-external-link"></i>
               External Link
             </a>
-            <a className="btn-add" href="javascript:" onClick={this.onDelete}>
+            <a className="btn-add" href="javascript:" onClick={self.onDelete}>
               <i className="btn-icon fa fa-trash-o"></i>
               Delete
             </a>
-            <span className="message">{this.state.message}</span>
+            <span className="message">{self.state.message}</span>
           </div>
         </div>
         <div className="inner wrap">
@@ -148,59 +115,35 @@ var ArticleEditor = React.createClass({
             <div className="left">
               <div className="preview">
                 <h1>Preview</h1>
-                <div className="cover-image">
-                  <label htmlFor="briefImage">
-                    {coverImage}
-                  </label>
-                  <input
-                    type="file"
-                    id="briefImage"
-                    onChange={this.onChange}/>
-                </div>
+                <Form.Input
+                  groupClass="cover-image"
+                  type="file"
+                  data={data}
+                  id="briefImage"
+                  label={coverImage}
+                  onChange={self.onChange}
+                  accept="image/x-png, image/gif, image/jpeg" />
                 <section className="title">
-                  <h1>{article.get('title')}</h1>
+                  <h1>{data.get('title')}</h1>
                   <sub>
-                    {article.get('writerName') ?
-                      (article.createdAt ?
-                        Util.formatDate(article.createdAt || new Date, 'yyyy-mm-dd')
+                    {data.get('writerName') ?
+                      (data.createdAt ?
+                        Util.formatDate(data.createdAt || new Date, 'yyyy-mm-dd')
                         + ' ' : '')
-                      + 'by ' + article.get('writerName') : ''}
+                      + 'by ' + data.get('writerName') : ''}
                   </sub>
                 </section>
                 <section
                   className="content"
-                  dangerouslySetInnerHTML={{__html: article.get('content')}}></section>
+                  dangerouslySetInnerHTML={{__html: data.get('content')}}></section>
               </div>
             </div>
             <div className="right">
-              <form onSubmit={this.onSubmit}>
-                <div className="input-group">
-                  <label className="label" htmlFor="title">Title</label>
-                  <input
-                    id="title"
-                    className="input"
-                    autoFocus
-                    placeholder="Title"
-                    onChange={this.onChange}
-                    value={article.get('title')} />
-                </div>
-                <div className="input-group">
-                  <label className="label" htmlFor="writerName">Author</label>
-                  <input
-                    id="writerName"
-                    className="input"
-                    placeholder="Author"
-                    onChange={this.onChange}
-                    value={article.get('writerName')} />
-                </div>
-                <div className="input-group">
-                  <label className="label" htmlFor="content">Content</label>
-                  <CKEditor
-                    id="content"
-                    value={article.get('content')}
-                    onChange={this.onChange}/>
-                </div>
-              </form>
+              <Form data={data} onChange={self.onChange}>
+                <Form.Input type="text" id="title" text="Title" autoFocus/>
+                <Form.Input type="text" id="writerName" text="Author"/>
+                <Form.Input type="text" id="content" text="Content" CKEditor/>
+              </Form>
             </div>
           </div>
         </div>

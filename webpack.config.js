@@ -16,7 +16,7 @@ module.exports = {
   },
   plugins: [
   	new HtmlWebpackPlugin({
-  		template: './src/assets/index.html'
+  		templateContent: '<script src="{%=o.htmlWebpackPlugin.assets.main%}"></script>'
   	})
   ],
   externals:[{

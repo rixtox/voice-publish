@@ -21,7 +21,7 @@ var routes = (
     </Route>
     <Route path="edit" handler={Editor}>
       <Route path="session/:sessionId?" handler={Editor.Session}/>
-      <Route path="session/:sessionId/article/:articleId?" handler={Editor.Article}/>
+      <Route path="session/:sessionId/article/:dataId?" handler={Editor.Article}/>
       <Route path="session/:sessionId/photo/:photoId?" handler={Editor.Photo}/>
     </Route>
     <Route name="login" path="login" handler={Login}/>

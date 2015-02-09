@@ -1,6 +1,6 @@
 var React = require('react');
+var {Parse} = require('parse');
 var Router = require('react-router');
-var {Parse} = require('../app.ls');
 
 var Link = Router.Link,
     Route = Router.Route,

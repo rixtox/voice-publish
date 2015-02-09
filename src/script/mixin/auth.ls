@@ -1,5 +1,4 @@
 {Parse} = require 'parse'
-LoginView = require '../view/login.jsx'
 
 Auth =
   getUser: ->
@@ -8,6 +7,7 @@ Auth =
   statics:
     willTransitionTo: (transition) ->
       unless Parse.User.current!
+        LoginView = require '../view/login.jsx'
         LoginView.attemptedTransition = transition
         transition.redirect '/login'
 

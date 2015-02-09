@@ -1,7 +1,7 @@
 var React = require('react');
 var {Parse} = require('parse');
 var Router = require('react-router');
-var Session = require('../model/session.ls');
+var {Session} = require('../models.ls');
 
 var {Link} = Router;
 

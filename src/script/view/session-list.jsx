@@ -1,9 +1,10 @@
 var React = require('react');
 var App = require('../app.ls');
+var {Parse} = require('parse');
 var Router = require('react-router');
-var Session = require('../model/session.ls');
+var {Session} = require('../models.ls');
 
-var {Parse, Mixin, Config} = App,
+var {Mixin, Config} = App,
     {Link, RouteHandler} = Router;
 
 var SessionItem = React.createClass({

@@ -2,8 +2,7 @@ var React = require('react');
 var App = require('../app.ls');
 var {Parse} = require('parse');
 var Router = require('react-router');
-var Article = require('../model/article.ls');
-var Session = require('../model/session.ls');
+var {Article, Session} = require('../models.ls');
 
 var {RouteHandler, Link} = Router;
 var {Config} = App;
