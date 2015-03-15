@@ -3,6 +3,11 @@ var path = require('path');
 var React = require('react');
 var {Util, Config, Parse, Mixin} = require('../app.ls');
 
+var MIN_HEIGHT = 500;
+var MAX_HEIGHT = document.body.clientHeight - 200;
+if (MAX_HEIGHT < MIN_HEIGHT)
+  MAX_HEIGHT = MIN_HEIGHT;
+
 var CKEditor = React.createClass({
   mixins: [Mixin.Upload],
 
@@ -14,7 +19,7 @@ var CKEditor = React.createClass({
 
   loadParseImagePlugin: function() {
     var self = this;
-    var fileInput = self.refs.file;
+    var imageInput = self.refs.imageInput;
 
     if (CKEDITOR.plugins.get('parse-image'))
       return;
@@ -31,9 +36,9 @@ var CKEditor = React.createClass({
           },
           requiredContent: 'img',
           exec: function() {
-          var {fileInput} = editor.config;
-          fileInput.onchange = function() {
-            self.uploadImages(this.files).then(function(images) {
+          var {imageInput} = editor.config;
+          imageInput.onchange = function() {
+            self.uploadFiles(this.files).then(function(images) {
               images.map(function(image) {
                 var figureDOM = editor.document.createElement('figure');
                 var imageDOM = editor.document.createElement('img');
@@ -46,7 +51,7 @@ var CKEditor = React.createClass({
               alert('Upload failed: ' + error.message);
             });
           };
-          fileInput.click();
+          imageInput.click();
         }});
         editor.ui.addButton( 'ParseImage', {
           label: 'Image',
@@ -63,17 +68,19 @@ var CKEditor = React.createClass({
 
     self.loadParseImagePlugin();
     var textarea = self.refs.textarea.getDOMNode();
-    var fileInput = self.refs.fileInput.getDOMNode();
+    var imageInput = self.refs.imageInput.getDOMNode();
     var editor = CKEDITOR.replace(textarea, {
-      extraPlugins: 'autogrow,justify,find,basicstyles,font,colorbutton,indentblock,parse-image',
+      extraPlugins: 'autogrow,justify,find,basicstyles,font,colorbutton,indentblock,pastefromword,parse-image',
       autoGrow_onStartup: true,
-      autoGrow_minHeight: 500,
-      fileInput: fileInput,
+      autoGrow_minHeight: MIN_HEIGHT,
+      autoGrow_maxHeight: MAX_HEIGHT,
+      pasteFromWordPromptCleanup: true,
+      imageInput: imageInput,
       toolbar: [
         { name: 'editing', groups: [ 'find', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'Scayt' ] },
         { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Strike', '-', 'RemoveFormat' ] },
         { name: 'insert', items: [ 'ParseImage', 'Table', 'HorizontalRule', 'SpecialChar' ] },
-        { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+        { name: 'links', items: [ 'Link', 'Unlink' ] },
         { name: 'document', items: [ 'Source' ] },
         '/',
         { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
@@ -110,7 +117,7 @@ var CKEditor = React.createClass({
     return (
       <div className="ckeditor">
         <textarea ref="textarea" style={{display: 'none'}}></textarea>
-        <input type="file" multiple="true" ref="fileInput" style={{display: 'none'}}></input>
+        <input type="file" multiple="true" ref="imageInput" style={{display: 'none'}} accept="image/x-png, image/gif, image/jpeg"></input>
       </div>
     );
   }
